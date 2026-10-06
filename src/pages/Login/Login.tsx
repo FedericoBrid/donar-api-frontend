@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useAuth } from "../../context/useAuth";
 import type { AuthResponse } from "../../types/auth";
 import api from "../../services/api";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
 
   const {login} = useAuth();
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,6 +21,8 @@ function Login() {
     });
 
     login(response.data);
+
+    navigate("/dashboard");
   };
 
   return (

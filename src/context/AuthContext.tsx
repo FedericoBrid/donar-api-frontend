@@ -8,14 +8,19 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<AuthResponse | null>(null);
+  const [user, setUser] = useState<AuthResponse | null>(() => {
+    const storedUser = localStorage.getItem("auth");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
   const login = (authResponse: AuthResponse) => {
     setUser(authResponse);
+    localStorage.setItem("auth", JSON.stringify(authResponse));
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem("auth");
   };
 
   return (

@@ -11,23 +11,30 @@ function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setError("");
+    try{
+      const response = await api.post<AuthResponse>("/auth/login", {
+        email,
+        password,
+      });
+  
+      login(response.data);
+  
+      navigate("/dashboard");
+    } catch (error) {
+      setError("Credenciales inválidas");
+    }
 
-    const response = await api.post<AuthResponse>("/auth/login", {
-      email,
-      password,
-    });
-
-    login(response.data);
-
-    navigate("/dashboard");
   };
 
   return (
     <div>
       <h1>Donar+</h1>
+      {error && <p>{error}</p>}
 
       <form onSubmit={handleSubmit}>
         <div>

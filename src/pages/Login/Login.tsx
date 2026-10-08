@@ -25,7 +25,7 @@ function Login() {
       login(response.data);
   
       navigate("/dashboard");
-    } catch (error) {
+    } catch {
       setError("Credenciales inválidas");
     }
 

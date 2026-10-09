@@ -12,17 +12,21 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
 
-  const [loading, setLoading] = useState(() => localStorage.getItem("token") !== null);
+  const [loading, setLoading] = useState(
+    () => localStorage.getItem("token") !== null,
+  );
 
-  const login = (authResponse: AuthResponse) => {
-    setUser({
-      userId: authResponse.userId,
-      firstName: authResponse.firstName,
-      lastName: authResponse.lastName,
-      email: authResponse.email,
-    });
-
+  const login = async (authResponse: AuthResponse): Promise<void> => {
     localStorage.setItem("token", authResponse.token);
+
+    try {
+      const response = await api.get<User>("/users/me");
+      setUser(response.data);
+    } catch (error) {
+      localStorage.removeItem("token");
+      setUser(null);
+      throw error;
+    }
   };
 
   const logout = () => {

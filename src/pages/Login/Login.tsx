@@ -22,7 +22,7 @@ function Login() {
         password,
       });
   
-      login(response.data);
+      await login(response.data);
   
       navigate("/dashboard");
     } catch {

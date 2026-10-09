@@ -5,7 +5,7 @@ import type { User } from "../types/User";
 export interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (authResponse: AuthResponse) => void;
+  login: (authResponse: AuthResponse) => Promise<void>;
   logout: () => void;
 }
 

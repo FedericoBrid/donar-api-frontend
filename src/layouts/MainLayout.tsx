@@ -18,6 +18,8 @@ function MainLayout() {
         <nav>
           <span>Bienvenido, {user?.firstName}</span>
 
+          <p>Roles: {user?.roles.join(", ")}</p>
+
           <button type="button" onClick={handleLogout}>
             Cerrar sesión
           </button>

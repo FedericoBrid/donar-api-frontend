@@ -1,3 +1,4 @@
+
 import {
   BrowserRouter,
   Routes,
@@ -11,18 +12,19 @@ import MainLayout from "../layouts/MainLayout";
 
 import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
+import PlaceholderPage from "../pages/PlaceholderPage";
 
 function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Main route */}
+        {/* Ruta inicial */}
         <Route
           path="/"
           element={<Navigate to="/dashboard" replace />}
         />
 
-        {/* Access for user not authenticated */}
+        {/* Acceso para usuarios no autenticados */}
         <Route
           path="/login"
           element={
@@ -32,7 +34,7 @@ function AppRouter() {
           }
         />
 
-        {/* Shared layout for protected pages */}
+        {/* Layout compartido para páginas protegidas */}
         <Route
           element={
             <ProtectedRoute>
@@ -45,10 +47,28 @@ function AppRouter() {
             element={<Dashboard />}
           />
 
-          {/* More protected pages will go here */}
+          <Route
+            path="/requests"
+            element={<PlaceholderPage title="Solicitudes" />}
+          />
+
+          <Route
+            path="/donations"
+            element={<PlaceholderPage title="Donaciones" />}
+          />
+
+          <Route
+            path="/blood-centers"
+            element={<PlaceholderPage title="Hemocentros" />}
+          />
+
+          <Route
+            path="/users"
+            element={<PlaceholderPage title="Usuarios" />}
+          />
         </Route>
 
-        {/* Unknown route */}
+        {/* Ruta desconocida */}
         <Route
           path="*"
           element={<Navigate to="/" replace />}

@@ -13,6 +13,7 @@ import MainLayout from "../layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
 import PlaceholderPage from "../pages/PlaceholderPage";
+import RoleRoute from "./RoleRoute";
 
 function AppRouter() {
   return (
@@ -57,15 +58,29 @@ function AppRouter() {
             element={<PlaceholderPage title="Donaciones" />}
           />
 
+          {/* ADMIN y HEMOADMIN */}
           <Route
-            path="/blood-centers"
-            element={<PlaceholderPage title="Hemocentros" />}
-          />
+            element={
+              <RoleRoute allowedRoles={["ADMIN", "HEMOADMIN"]} />
+            }
+          >
+            <Route
+              path="/blood-centers"
+              element={<PlaceholderPage title="Hemocentros" />}
+            />
+          </Route>
 
+          {/* Solo ADMIN */}
           <Route
-            path="/users"
-            element={<PlaceholderPage title="Usuarios" />}
-          />
+            element={
+              <RoleRoute allowedRoles={["ADMIN"]} />
+            }
+          >
+            <Route
+              path="/users"
+              element={<PlaceholderPage title="Usuarios" />}
+            />
+          </Route>
         </Route>
 
         {/* Ruta desconocida */}

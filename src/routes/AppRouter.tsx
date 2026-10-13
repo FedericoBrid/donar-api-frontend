@@ -14,6 +14,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
 import PlaceholderPage from "../pages/PlaceholderPage";
 import RoleRoute from "./RoleRoute";
+import Requests from "../pages/Request/Requests";
 
 function AppRouter() {
   return (
@@ -50,7 +51,7 @@ function AppRouter() {
 
           <Route
             path="/requests"
-            element={<PlaceholderPage title="Solicitudes" />}
+            element={<Requests />}
           />
 
           <Route

@@ -1,83 +1,43 @@
+
 import { useEffect, useState } from "react";
 import { getBloodRequests } from "../../services/bloodRequestService";
 import type { BloodRequest } from "../../types/BloodRequest";
-import { formatDate, getStatusLabel, getUrgencyLabel } from "../../utils/bloodRequestUtils";
+import RequestCards from "./RequestCards";
 
 function Requests() {
-    const [requests, setRequests] = useState<BloodRequest[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+  const [requests, setRequests] = useState<BloodRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-    useEffect(() => {
-        async function loadRequests() {
-            try {
-                const data = await getBloodRequests();
-                setRequests(data);
-            } catch {
-                setError("No se pudieron cargar las solicitudes.");
-            } finally {
-                setLoading(false);
-            }
-        }
-        loadRequests();
-    }, []);
+  useEffect(() => {
+    async function loadRequests() {
+      try {
+        const data = await getBloodRequests();
+        setRequests(data);
+      } catch {
+        setError("No se pudieron cargar las solicitudes.");
+      } finally {
+        setLoading(false);
+      }
+    }
 
-    if (loading) {
+    void loadRequests();
+  }, []);
+
+  if (loading) {
     return <p>Cargando solicitudes...</p>;
-    }
+  }
 
-    if (error) {
-        return <p role="alert">{error}</p>;
-    }
+  if (error) {
+    return <p role="alert">{error}</p>;
+  }
 
-    return (
+  return (
     <section>
       <h2>Solicitudes de sangre</h2>
-
-      {requests.length === 0 ? (
-        <p>No hay solicitudes disponibles.</p>
-      ) : (
-        <div>
-          {requests.map((request) => (
-            <article key={request.id}>
-              <h3>
-                {request.bloodTypeName} {request.rhFactorName}
-              </h3>
-
-              <p>
-                <strong>Hemocentro:</strong>{" "}
-                {request.bloodCenterName}
-              </p>
-
-              <p>
-                <strong>Dirección:</strong>{" "}
-                {request.bloodCenterAddress}
-              </p>
-
-              <p>
-                <strong>Teléfono:</strong>{" "}
-                {request.bloodCenterPhone}
-              </p>
-
-              <p>
-                <strong>Urgencia:</strong>{" "}
-                {getUrgencyLabel(request.urgency)}
-              </p>
-
-              <p>
-                <strong>Estado:</strong>{" "}
-                {getStatusLabel(request.status)}
-              </p>
-
-              <p>
-                <strong>Vencimiento:</strong>{" "}
-                {formatDate(request.expirationDate)}
-              </p>
-            </article>
-          ))}
-        </div>
-      )}
+      <RequestCards requests={requests} />
     </section>
   );
 }
+
 export default Requests;

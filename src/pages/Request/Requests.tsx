@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getBloodRequests } from "../../services/bloodRequestService";
 import type { BloodRequest } from "../../types/BloodRequest";
+import { formatDate, getStatusLabel, getUrgencyLabel } from "../../utils/bloodRequestUtils";
 
 function Requests() {
     const [requests, setRequests] = useState<BloodRequest[]>([]);
@@ -12,7 +13,7 @@ function Requests() {
             try {
                 const data = await getBloodRequests();
                 setRequests(data);
-            } catch (error) {
+            } catch {
                 setError("No se pudieron cargar las solicitudes.");
             } finally {
                 setLoading(false);
@@ -60,17 +61,17 @@ function Requests() {
 
               <p>
                 <strong>Urgencia:</strong>{" "}
-                {request.urgency}
+                {getUrgencyLabel(request.urgency)}
               </p>
 
               <p>
                 <strong>Estado:</strong>{" "}
-                {request.status}
+                {getStatusLabel(request.status)}
               </p>
 
               <p>
                 <strong>Vencimiento:</strong>{" "}
-                {request.expirationDate}
+                {formatDate(request.expirationDate)}
               </p>
             </article>
           ))}

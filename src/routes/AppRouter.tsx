@@ -15,6 +15,7 @@ import GuestRoute from "./GuestRoute";
 import PlaceholderPage from "../pages/PlaceholderPage";
 import RoleRoute from "./RoleRoute";
 import Requests from "../pages/Request/Requests";
+import Donations from "../pages/Donations/Donations";
 
 function AppRouter() {
   return (
@@ -56,7 +57,7 @@ function AppRouter() {
 
           <Route
             path="/donations"
-            element={<PlaceholderPage title="Donaciones" />}
+            element={<Donations />}
           />
 
           {/* ADMIN y HEMOADMIN */}

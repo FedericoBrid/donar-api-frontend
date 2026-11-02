@@ -26,7 +26,7 @@ import {
 
 import { useAuth } from "../../context/useAuth";
 import { getBloodRequestsByStatus } from "../../services/bloodRequestService";
-import { getAllDonations } from "../../services/donationService";
+import { getDonationStatistics } from "../../services/donationService";
 
 import "./Dashboard.css";
 
@@ -149,20 +149,12 @@ function Dashboard() {
 
     async function fetchDonations() {
       try {
-        const data = await getAllDonations();
+        const data = await getDonationStatistics();
 
         if (active) {
-          setRegisteredDonations(
-            data.filter((donation) => donation.status === "REGISTERED").length,
-          );
-
-          setCompletedDonations(
-            data.filter((donation) => donation.status === "COMPLETED").length,
-          );
-
-          setCancelledDonations(
-            data.filter((donation) => donation.status === "CANCELLED").length,
-          );
+          setRegisteredDonations(data.registeredDonations);
+          setCompletedDonations(data.completedDonations);
+          setCancelledDonations(data.cancelledDonations);
         }
       } catch {
         if (active) {

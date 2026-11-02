@@ -37,6 +37,12 @@ export interface Donation {
   updatedAt: string | null;
 }
 
+export interface DonationStatistics {
+  registeredDonations: number;
+  completedDonations: number;
+  cancelledDonations: number;
+}
+
 export async function registerDonation(
   bloodRequestId: number,
 ): Promise<void> {
@@ -77,3 +83,11 @@ export async function getAllDonations(): Promise<Donation[]> {
   const response = await api.get<Donation[]>("/donations");
   return response.data;
 }
+
+export const getDonationStatistics = async (): Promise<DonationStatistics> => {
+  const response = await api.get<DonationStatistics>(
+    "/donations/statistics"
+  );
+
+  return response.data;
+};

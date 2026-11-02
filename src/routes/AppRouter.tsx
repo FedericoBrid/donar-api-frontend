@@ -12,12 +12,12 @@ import MainLayout from "../layouts/MainLayout";
 
 import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
-import PlaceholderPage from "../pages/PlaceholderPage";
 import RoleRoute from "./RoleRoute";
 import Requests from "../pages/Request/Requests";
 import Donations from "../pages/Donations/Donations";
 import DonationManagement from "../pages/Donations/DonationManagement";
 import Users from "../pages/Users/Users";
+import BloodCenters from "../pages/BloodCenters/BloodCenters";
 
 function AppRouter() {
   return (
@@ -81,7 +81,7 @@ function AppRouter() {
           >
             <Route
               path="/blood-centers"
-              element={<PlaceholderPage title="Hemocentros" />}
+              element={<BloodCenters />}
             />
           </Route>
 

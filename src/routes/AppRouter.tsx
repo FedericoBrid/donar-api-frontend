@@ -17,6 +17,7 @@ import RoleRoute from "./RoleRoute";
 import Requests from "../pages/Request/Requests";
 import Donations from "../pages/Donations/Donations";
 import DonationManagement from "../pages/Donations/DonationManagement";
+import Users from "../pages/Users/Users";
 
 function AppRouter() {
   return (
@@ -90,10 +91,7 @@ function AppRouter() {
               <RoleRoute allowedRoles={["ADMIN"]} />
             }
           >
-            <Route
-              path="/users"
-              element={<PlaceholderPage title="Usuarios" />}
-            />
+            <Route path="/users" element={<Users />} />
           </Route>
         </Route>
 

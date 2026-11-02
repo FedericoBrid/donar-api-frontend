@@ -13,6 +13,7 @@ import type {
   UpdateUserRequest,
 } from "../../services/userService";
 import UserForm from "./components/UserForm.tsx";
+import UserRoleManager from "./components/UserRoleManager.tsx";
 
 function Users() {
   const [users, setUsers] = useState<User[]>([]);
@@ -22,6 +23,8 @@ function Users() {
 
   const [showForm, setShowForm] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [selectedUserForRoles, setSelectedUserForRoles] =
+    useState<User | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -72,12 +75,14 @@ function Users() {
 
   function handleCreate() {
     setEditingUser(null);
+    setSelectedUserForRoles(null);
     setShowForm(true);
     setError("");
   }
 
   function handleEdit(user: User) {
     setEditingUser(user);
+    setSelectedUserForRoles(null);
     setShowForm(true);
     setError("");
   }
@@ -117,6 +122,15 @@ function Users() {
     }
   }
 
+  async function handleRolesUpdated() {
+    try {
+      const updatedUsers = await getUsers();
+      setUsers(updatedUsers);
+    } catch {
+      setError("Los roles se actualizaron, pero no se pudo refrescar el listado.");
+    }
+  }
+
   if (loading) {
     return <p>Cargando usuarios...</p>;
   }
@@ -147,62 +161,83 @@ function Users() {
       )}
 
       {!showForm && (
-        users.length === 0 ? (
-          <p>No hay usuarios registrados.</p>
-        ) : (
-          <div style={{ overflowX: "auto" }}>
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nombre y apellido</th>
-                  <th>Email</th>
-                  <th>Fecha de nacimiento</th>
-                  <th>Género</th>
-                  <th>Grupo sanguíneo</th>
-                  <th>Roles</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.id}</td>
-                    <td>{user.firstName} {user.lastName}</td>
-                    <td>{user.email}</td>
-                    <td>{user.birthDate}</td>
-                    <td>{user.gender}</td>
-                    <td>{user.bloodTypeName} {user.rhFactorName}</td>
-                    <td>{user.roles.join(", ")}</td>
-                    <td>{user.status ? "Activo" : "Inactivo"}</td>
-                    <td>
-                      <button
-                        type="button"
-                        onClick={() => handleEdit(user)}
-                      >
-                        Editar
-                      </button>
-
-                      <button
-                        type="button"
-                        disabled={updatingId === user.id}
-                        onClick={() => void handleStatusChange(user)}
-                      >
-                        {updatingId === user.id
-                          ? "Actualizando..."
-                          : user.status
-                            ? "Desactivar"
-                            : "Activar"}
-                      </button>
-                    </td>
+        <>
+          {users.length === 0 ? (
+            <p>No hay usuarios registrados.</p>
+          ) : (
+            <div style={{ overflowX: "auto" }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nombre y apellido</th>
+                    <th>Email</th>
+                    <th>Fecha de nacimiento</th>
+                    <th>Género</th>
+                    <th>Grupo sanguíneo</th>
+                    <th>Roles</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )
+                </thead>
+
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user.id}>
+                      <td>{user.id}</td>
+                      <td>{user.firstName} {user.lastName}</td>
+                      <td>{user.email}</td>
+                      <td>{user.birthDate}</td>
+                      <td>{user.gender}</td>
+                      <td>{user.bloodTypeName} {user.rhFactorName}</td>
+                      <td>{user.roles.join(", ")}</td>
+                      <td>{user.status ? "Activo" : "Inactivo"}</td>
+                      <td>
+                        <button
+                          type="button"
+                          onClick={() => handleEdit(user)}
+                        >
+                          Editar
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={updatingId === user.id}
+                          onClick={() => void handleStatusChange(user)}
+                        >
+                          {updatingId === user.id
+                            ? "Actualizando..."
+                            : user.status
+                              ? "Desactivar"
+                              : "Activar"}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedUserForRoles(user);
+                            setError("");
+                          }}
+                        >
+                          Gestionar roles
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {selectedUserForRoles && (
+            <UserRoleManager
+              userId={selectedUserForRoles.id}
+              userName={`${selectedUserForRoles.firstName} ${selectedUserForRoles.lastName}`}
+              onClose={() => setSelectedUserForRoles(null)}
+              onRolesUpdated={handleRolesUpdated}
+            />
+          )}
+        </>
       )}
     </section>
   );

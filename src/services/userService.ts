@@ -27,6 +27,13 @@ export interface AssignRoleRequest {
   roleId: number;
 }
 
+export interface UserRole {
+  id: number;
+  roleId: number;
+  roleName: string;
+  status: boolean;
+}
+
 export async function getUsers(): Promise<User[]> {
   const response = await api.get<User[]>("/users");
   return response.data;
@@ -64,10 +71,26 @@ export async function activateUser(id: number): Promise<User> {
 
 export async function assignRole(
   userId: number,
-  roleId: number,
+  roleId: number
 ): Promise<void> {
   await api.post(`/users/${userId}/roles`, {
-    userId,
     roleId,
-  } satisfies AssignRoleRequest);
+  });
+}
+
+export async function getUserRoles(
+  userId: number
+): Promise<UserRole[]> {
+  const response = await api.get<UserRole[]>(
+    `/users/${userId}/roles`
+  );
+
+  return response.data;
+}
+
+export async function deactivateRole(
+  userId: number,
+  roleId: number
+): Promise<void> {
+  await api.put(`/users/${userId}/roles/${roleId}`);
 }

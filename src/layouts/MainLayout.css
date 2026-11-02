@@ -1,0 +1,117 @@
+
+.main-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #F7F8FA;
+}
+
+.main-layout__drawer {
+  width: 260px;
+  flex-shrink: 0;
+}
+
+.main-layout__drawer .MuiDrawer-paper {
+  width: 260px;
+  box-sizing: border-box;
+  background-color: #FFFFFF;
+  border-right: 1px solid #E8EAED;
+}
+
+.main-layout__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 22px;
+}
+
+.main-layout__brand-icon {
+  color: #D71920;
+  font-size: 34px !important;
+}
+
+.main-layout__navigation {
+  padding: 12px !important;
+}
+
+.main-layout__nav-item {
+  min-height: 48px;
+  margin-bottom: 5px !important;
+  border-radius: 9px !important;
+  color: #667085 !important;
+  transition: background-color 0.2s ease;
+}
+
+.main-layout__nav-item:hover {
+  background-color: #FFF1F1 !important;
+  color: #D71920 !important;
+}
+
+.main-layout__nav-item.active {
+  background-color: #FCE8E9 !important;
+  color: #D71920 !important;
+  font-weight: 600;
+}
+
+.main-layout__nav-item.active .MuiListItemIcon-root {
+  color: #D71920;
+}
+
+.main-layout__nav-item .MuiListItemIcon-root {
+  min-width: 42px;
+  color: #7A8491;
+}
+
+.main-layout__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.main-layout__toolbar {
+  display: flex;
+  justify-content: space-between;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #E8EAED;
+  padding: 0 28px !important;
+  min-height: 72px;
+}
+
+.main-layout__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.main-layout__main {
+  padding: 32px;
+}
+
+@media (max-width: 600px) {
+  .main-layout__toolbar {
+    padding: 0 14px !important;
+    min-height: 64px;
+  }
+
+  .main-layout__main {
+    padding: 20px 14px;
+  }
+
+  
+.main-layout__nav-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 9px;
+  margin-bottom: 5px;
+}
+
+.main-layout__nav-link.active .main-layout__nav-item {
+  background-color: #FCE8E9;
+  color: #D71920;
+  font-weight: 600;
+}
+
+.main-layout__nav-link.active .MuiListItemIcon-root {
+  color: #D71920;
+}
+
+}

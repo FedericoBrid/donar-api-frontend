@@ -1,0 +1,145 @@
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  width: 100%;
+}
+
+.dashboard__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dashboard__welcome {
+  background: linear-gradient(115deg, #D71920 0%, #A81219 100%);
+  color: #FFFFFF;
+  border: none !important;
+  overflow: hidden;
+}
+
+.dashboard__welcome-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px !important;
+}
+
+.dashboard__welcome-info {
+  max-width: 650px;
+}
+
+.dashboard__welcome-icon {
+  font-size: 115px !important;
+  opacity: 0.18;
+  margin-right: 20px;
+}
+
+.dashboard__roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.dashboard__section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.dashboard__section-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dashboard__stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.dashboard__stat-card {
+  height: 100%;
+}
+
+.dashboard__stat-card .MuiCardContent-root {
+  padding: 22px;
+}
+
+.dashboard__stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard__stat-value {
+  display: flex;
+  align-items: center;
+  min-height: 65px;
+  margin-top: 12px;
+}
+
+.dashboard__quick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.dashboard__quick-card {
+  height: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard__quick-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(16, 24, 40, 0.10);
+}
+
+.dashboard__quick-card .MuiCardContent-root {
+  padding: 24px;
+}
+
+.dashboard__quick-icon {
+  width: 48px !important;
+  height: 48px !important;
+  background-color: #FCE8E9 !important;
+  color: #D71920 !important;
+}
+
+@media (max-width: 1100px) {
+  .dashboard__stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard__quick-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard {
+    gap: 24px;
+  }
+
+  .dashboard__welcome-content {
+    padding: 22px !important;
+  }
+
+  .dashboard__welcome-icon {
+    display: none;
+  }
+
+  .dashboard__stats-grid,
+  .dashboard__quick-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard__stat-card .MuiCardContent-root,
+  .dashboard__quick-card .MuiCardContent-root {
+    padding: 18px;
+  }
+}

@@ -72,3 +72,8 @@ export async function completeDonation(
 ): Promise<void> {
   await api.patch(`/donations/${donationId}/complete`);
 }
+
+export async function getAllDonations(): Promise<Donation[]> {
+  const response = await api.get<Donation[]>("/donations");
+  return response.data;
+}

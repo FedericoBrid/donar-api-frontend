@@ -1,5 +1,5 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -8,6 +8,7 @@ import {
 
 import {
   completeDonation,
+  getAllDonations,
   getDonationsByBloodRequest,
   type Donation,
 } from "../../services/donationService";
@@ -15,32 +16,75 @@ import {
 function DonationManagement() {
   const [bloodRequestId, setBloodRequestId] = useState("");
   const [donations, setDonations] = useState<Donation[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [completingId, setCompletingId] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  async function searchDonations() {
-    const id = Number(bloodRequestId);
-
-    if (!Number.isInteger(id) || id <= 0) {
-      setError("Ingresá un ID de solicitud válido.");
-      return;
-    }
-
+  async function loadDonations(requestId?: string) {
     setLoading(true);
     setError("");
-    setMessage("");
 
     try {
-      const data = await getDonationsByBloodRequest(id);
+      const data = requestId
+        ? await getDonationsByBloodRequest(Number(requestId))
+        : await getAllDonations();
+
       setDonations(data);
     } catch {
-      setError("No se pudieron cargar las inscripciones.");
+      setError("No se pudieron cargar las donaciones.");
       setDonations([]);
     } finally {
       setLoading(false);
     }
+  }
+
+  useEffect(() => {
+    let active = true;
+
+    async function fetchInitialDonations() {
+        try {
+        const data = await getAllDonations();
+
+        if (active) {
+            setDonations(data);
+        }
+        } catch {
+        if (active) {
+            setError("No se pudieron cargar las donaciones.");
+        }
+        } finally {
+        if (active) {
+            setLoading(false);
+        }
+        }
+    }
+
+    void fetchInitialDonations();
+
+        return () => {
+            active = false;
+        };
+    }, []);
+
+  async function searchDonations() {
+    const id = bloodRequestId.trim();
+
+    setMessage("");
+
+    if (!id) {
+      await loadDonations();
+      return;
+    }
+
+    const numericId = Number(id);
+
+    if (!Number.isInteger(numericId) || numericId <= 0) {
+      setError("Ingresá un ID de solicitud válido.");
+      return;
+    }
+
+    await loadDonations(id);
   }
 
   async function handleComplete(donationId: number) {
@@ -61,11 +105,7 @@ function DonationManagement() {
 
       setMessage("La donación se marcó como completada.");
 
-      const data = await getDonationsByBloodRequest(
-        Number(bloodRequestId),
-      );
-
-      setDonations(data);
+      await loadDonations(bloodRequestId.trim() || undefined);
     } catch {
       setError(
         "No se pudo completar la donación. Verificá su estado e intentá nuevamente.",
@@ -140,7 +180,7 @@ function DonationManagement() {
         },
       },
     ],
-    [completingId, bloodRequestId],
+    [completingId],
   );
 
   const table = useMaterialReactTable({
@@ -182,11 +222,23 @@ function DonationManagement() {
           min="1"
           value={bloodRequestId}
           onChange={(event) => setBloodRequestId(event.target.value)}
-          required
+          placeholder="Ingresá un ID para filtrar"
         />
 
         <button type="submit" disabled={loading}>
-          {loading ? "Buscando..." : "Buscar inscripciones"}
+          {loading ? "Cargando..." : "Buscar"}
+        </button>
+
+        <button
+          type="button"
+          disabled={loading}
+          onClick={() => {
+            setBloodRequestId("");
+            setMessage("");
+            void loadDonations();
+        }}
+        >
+        Ver todas
         </button>
       </form>
 

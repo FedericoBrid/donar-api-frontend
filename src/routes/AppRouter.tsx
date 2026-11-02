@@ -16,6 +16,7 @@ import PlaceholderPage from "../pages/PlaceholderPage";
 import RoleRoute from "./RoleRoute";
 import Requests from "../pages/Request/Requests";
 import Donations from "../pages/Donations/Donations";
+import DonationManagement from "../pages/Donations/DonationManagement";
 
 function AppRouter() {
   return (
@@ -61,6 +62,17 @@ function AppRouter() {
           />
 
           {/* ADMIN y HEMOADMIN */}
+          <Route
+            element={
+              <RoleRoute allowedRoles={["ADMIN", "HEMOADMIN"]} />
+            }
+          >
+            <Route
+              path="/donation-management"
+              element={<DonationManagement />}
+            />
+          </Route>
+
           <Route
             element={
               <RoleRoute allowedRoles={["ADMIN", "HEMOADMIN"]} />

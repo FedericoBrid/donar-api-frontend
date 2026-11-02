@@ -27,6 +27,11 @@ const navigationItems = [
     path: "/users",
     roles: ["ADMIN"],
   },
+  {
+  label: "Gestión de donaciones",
+  path: "/donation-management",
+  roles: ["ADMIN", "HEMOADMIN"],
+  },
 ];
 
 function MainLayout() {

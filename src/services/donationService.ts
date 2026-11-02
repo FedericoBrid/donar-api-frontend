@@ -24,6 +24,19 @@ export interface MyDonation {
   updatedAt: string | null;
 }
 
+export interface Donation {
+  id: number;
+  userId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  bloodRequestId: number;
+  status: "REGISTERED" | "COMPLETED" | "CANCELLED";
+  registeredAt: string;
+  donatedAt: string | null;
+  updatedAt: string | null;
+}
+
 export async function registerDonation(
   bloodRequestId: number,
 ): Promise<void> {
@@ -42,4 +55,20 @@ export async function cancelDonation(
   donationId: number,
 ): Promise<void> {
   await api.patch(`/donations/${donationId}/cancel`);
+}
+
+export async function getDonationsByBloodRequest(
+  bloodRequestId: number,
+): Promise<Donation[]> {
+  const response = await api.get<Donation[]>(
+    `/donations/blood-request/${bloodRequestId}`,
+  );
+
+  return response.data;
+}
+
+export async function completeDonation(
+  donationId: number,
+): Promise<void> {
+  await api.patch(`/donations/${donationId}/complete`);
 }

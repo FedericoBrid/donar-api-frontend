@@ -1,10 +1,30 @@
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import "./DonationManagment.css";
+
 import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
+
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  Paper,
+  TextField,
+  Typography,
+} from "@mui/material";
+
+import {
+  CheckCircleOutlined,
+  VolunteerActivism,
+  Search,
+  RestartAlt,
+} from "@mui/icons-material";
 
 import {
   completeDonation,
@@ -21,7 +41,8 @@ function DonationManagement() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  async function loadDonations(requestId?: string) {
+  // Carga de donaciones
+  const loadDonations = useCallback(async (requestId?: string) => {
     setLoading(true);
     setError("");
 
@@ -37,40 +58,43 @@ function DonationManagement() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
+  // Carga inicial
   useEffect(() => {
     let active = true;
 
     async function fetchInitialDonations() {
-        try {
+      try {
         const data = await getAllDonations();
 
         if (active) {
-            setDonations(data);
+          setDonations(data);
         }
-        } catch {
+      } catch {
         if (active) {
-            setError("No se pudieron cargar las donaciones.");
+          setError("No se pudieron cargar las donaciones.");
         }
-        } finally {
+      } finally {
         if (active) {
-            setLoading(false);
+          setLoading(false);
         }
-        }
+      }
     }
 
     void fetchInitialDonations();
 
-        return () => {
-            active = false;
-        };
-    }, []);
+    return () => {
+      active = false;
+    };
+  }, []);
 
+  // Búsqueda por ID de solicitud
   async function searchDonations() {
     const id = bloodRequestId.trim();
 
     setMessage("");
+    setError("");
 
     if (!id) {
       await loadDonations();
@@ -87,34 +111,39 @@ function DonationManagement() {
     await loadDonations(id);
   }
 
-  async function handleComplete(donationId: number) {
-    const confirmed = window.confirm(
-      "¿Confirmás que esta donación se realizó efectivamente?",
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    setCompletingId(donationId);
-    setError("");
-    setMessage("");
-
-    try {
-      await completeDonation(donationId);
-
-      setMessage("La donación se marcó como completada.");
-
-      await loadDonations(bloodRequestId.trim() || undefined);
-    } catch {
-      setError(
-        "No se pudo completar la donación. Verificá su estado e intentá nuevamente.",
+  // Marcar una donación como completada
+  const handleComplete = useCallback(
+    async (donationId: number) => {
+      const confirmed = window.confirm(
+        "¿Confirmás que esta donación se realizó efectivamente?",
       );
-    } finally {
-      setCompletingId(null);
-    }
-  }
 
+      if (!confirmed) {
+        return;
+      }
+
+      setCompletingId(donationId);
+      setError("");
+      setMessage("");
+
+      try {
+        await completeDonation(donationId);
+
+        setMessage("La donación se marcó como completada.");
+
+        await loadDonations(bloodRequestId.trim() || undefined);
+      } catch {
+        setError(
+          "No se pudo completar la donación. Verificá su estado e intentá nuevamente.",
+        );
+      } finally {
+        setCompletingId(null);
+      }
+    },
+    [bloodRequestId, loadDonations],
+  );
+
+  // Definición de columnas
   const columns = useMemo<MRT_ColumnDef<Donation>[]>(
     () => [
       {
@@ -143,6 +172,13 @@ function DonationManagement() {
         accessorFn: (row) => getDonationStatusLabel(row.status),
         id: "status",
         header: "Estado",
+        Cell: ({ row }) => (
+          <Chip
+            label={getDonationStatusLabel(row.original.status)}
+            size="small"
+            color={getDonationStatusColor(row.original.status)}
+          />
+        ),
       },
       {
         accessorFn: (row) => formatDateTime(row.registeredAt),
@@ -165,24 +201,32 @@ function DonationManagement() {
           const isCompleting = completingId === donation.id;
 
           if (donation.status !== "REGISTERED") {
-            return "Sin acciones";
+            return (
+              <Typography variant="body2" color="text.secondary">
+                Sin acciones
+              </Typography>
+            );
           }
 
           return (
-            <button
-              type="button"
+            <Button
+              variant="contained"
+              color="success"
+              size="small"
+              startIcon={<CheckCircleOutlined />}
               disabled={isCompleting}
               onClick={() => void handleComplete(donation.id)}
             >
               {isCompleting ? "Procesando..." : "Marcar completada"}
-            </button>
+            </Button>
           );
         },
       },
     ],
-    [completingId],
+    [completingId, handleComplete],
   );
 
+  // Configuración de la tabla
   const table = useMaterialReactTable({
     columns,
     data: donations,
@@ -200,56 +244,175 @@ function DonationManagement() {
         pageSize: 10,
       },
     },
+    localization: {
+      noRecordsToDisplay: "No hay donaciones para mostrar",
+      noResultsFound: "No se encontraron resultados",
+      search: "Buscar",
+      rowsPerPage: "Filas por página",
+      of: "de",
+    },
+    muiTablePaperProps: {
+      elevation: 0,
+      sx: {
+        border: "1px solid",
+        borderColor: "divider",
+        borderRadius: 2,
+        overflow: "hidden",
+      },
+    },
+    muiTableHeadCellProps: {
+      sx: {
+        backgroundColor: "#F7F8FA",
+        color: "#263238",
+        fontWeight: 700,
+      },
+    },
+    muiTableBodyRowProps: {
+      sx: {
+        "&:hover": {
+          backgroundColor: "#FFF5F5",
+        },
+      },
+    },
+    muiSearchTextFieldProps: {
+      placeholder: "Buscar donación...",
+      size: "small",
+      variant: "outlined",
+    },
   });
 
   return (
-    <section>
-      <h2>Gestión de donaciones</h2>
-
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          void searchDonations();
+    <Box className="donation-management-page">
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 3,
         }}
       >
-        <label htmlFor="bloodRequestId">
-          ID de solicitud
-        </label>
+        {/* Encabezado */}
+        <Box>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1.5,
+            }}
+          >
+            <VolunteerActivism
+              sx={{ color: "#D71920", fontSize: 32 }}
+            />
 
-        <input
-          id="bloodRequestId"
-          type="number"
-          min="1"
-          value={bloodRequestId}
-          onChange={(event) => setBloodRequestId(event.target.value)}
-          placeholder="Ingresá un ID para filtrar"
-        />
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: 700 }}
+              color="#263238"
+            >
+              Gestión de donaciones
+            </Typography>
+          </Box>
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Cargando..." : "Buscar"}
-        </button>
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ mt: 1 }}
+          >
+            Consultá las inscripciones y gestioná el estado de las donaciones.
+          </Typography>
+        </Box>
 
-        <button
-          type="button"
-          disabled={loading}
-          onClick={() => {
-            setBloodRequestId("");
-            setMessage("");
-            void loadDonations();
-        }}
+        {/* Filtro por solicitud */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2.5,
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 2,
+          }}
         >
-        Ver todas
-        </button>
-      </form>
+          <Box
+            component="form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void searchDonations();
+            }}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              flexWrap: "wrap",
+            }}
+          >
+            <TextField
+              label="ID de solicitud"
+              type="number"
+              size="small"
+              value={bloodRequestId}
+              onChange={(event) => setBloodRequestId(event.target.value)}
+              placeholder="Ingresá un ID"
+              slotProps={{
+                htmlInput: {
+                  min: 1,
+                },
+              }}
+              sx={{
+                minWidth: 220,
+                flex: 1,
+              }}
+            />
 
-      {error && <p role="alert">{error}</p>}
-      {message && <p role="status">{message}</p>}
+            <Button
+              type="submit"
+              variant="contained"
+              color="error"
+              startIcon={<Search />}
+              disabled={loading}
+            >
+              Buscar
+            </Button>
 
-      <MaterialReactTable table={table} />
-    </section>
+            <Button
+              type="button"
+              variant="outlined"
+              color="inherit"
+              startIcon={<RestartAlt />}
+              disabled={loading}
+              onClick={() => {
+                setBloodRequestId("");
+                setMessage("");
+                setError("");
+                void loadDonations();
+              }}
+            >
+              Ver todas
+            </Button>
+          </Box>
+        </Paper>
+
+        {/* Mensajes */}
+        {error && (
+          <Alert severity="error" onClose={() => setError("")}>
+            {error}
+          </Alert>
+        )}
+
+        {message && (
+          <Alert severity="success" onClose={() => setMessage("")}>
+            {message}
+          </Alert>
+        )}
+
+        {/* Tabla */}
+        <Paper elevation={0} sx={{ borderRadius: 2 }}>
+          <MaterialReactTable table={table} />
+        </Paper>
+      </Box>
+    </Box>
   );
 }
 
+// Traducción de estados
 function getDonationStatusLabel(status: Donation["status"]): string {
   const labels = {
     REGISTERED: "Registrada",
@@ -260,6 +423,20 @@ function getDonationStatusLabel(status: Donation["status"]): string {
   return labels[status];
 }
 
+// Colores de estados
+function getDonationStatusColor(
+  status: Donation["status"],
+): "warning" | "success" | "error" {
+  const colors = {
+    REGISTERED: "warning",
+    COMPLETED: "success",
+    CANCELLED: "error",
+  } as const;
+
+  return colors[status];
+}
+
+// Formato de fecha y hora
 function formatDateTime(value: string): string {
   const [date, time] = value.split("T");
 

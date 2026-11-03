@@ -1,0 +1,11 @@
+.donation-management-page {
+  width: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .donation-management-page {
+    padding: 16px;
+  }
+}

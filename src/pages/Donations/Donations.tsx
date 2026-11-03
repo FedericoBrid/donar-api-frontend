@@ -1,10 +1,27 @@
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import "./Donations.css";
+
 import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
+
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  Paper,
+  Typography,
+} from "@mui/material";
+
+import {
+  CancelOutlined,
+  VolunteerActivism,
+} from "@mui/icons-material";
 
 import {
   cancelDonation,
@@ -54,7 +71,7 @@ function Donations() {
   }, []);
 
   // Cancelación de una inscripción
-  async function handleCancel(donationId: number) {
+  const handleCancel = useCallback(async (donationId: number) => {
     const confirmed = window.confirm(
       "¿Estás seguro de que querés cancelar esta inscripción?",
     );
@@ -79,7 +96,7 @@ function Donations() {
     } finally {
       setCancellingId(null);
     }
-  }
+  }, []);
 
   // Definición de las columnas
   const columns = useMemo<MRT_ColumnDef<MyDonation>[]>(
@@ -108,17 +125,40 @@ function Donations() {
         accessorFn: (row) => getRequestStatusLabel(row.requestStatus),
         id: "requestStatus",
         header: "Estado de solicitud",
+        Cell: ({ row }) => (
+          <Chip
+            label={getRequestStatusLabel(row.original.requestStatus)}
+            size="small"
+            color={getRequestStatusColor(row.original.requestStatus)}
+            variant="outlined"
+          />
+        ),
       },
       {
         accessorFn: (row) => getDonationStatusLabel(row.donationStatus),
         id: "donationStatus",
         header: "Estado de donación",
+        Cell: ({ row }) => (
+          <Chip
+            label={getDonationStatusLabel(row.original.donationStatus)}
+            size="small"
+            color={getDonationStatusColor(row.original.donationStatus)}
+          />
+        ),
       },
       {
         accessorFn: (row) =>
           formatDate(row.registeredAt.split("T")[0]),
         id: "registeredAt",
         header: "Fecha de inscripción",
+      },
+      {
+        accessorFn: (row) =>
+          row.donatedAt
+            ? formatDate(row.donatedAt.split("T")[0])
+            : "—",
+        id: "donatedAt",
+        header: "Fecha de donación",
       },
       {
         id: "actions",
@@ -130,22 +170,29 @@ function Donations() {
           const isCancelling = cancellingId === donation.donationId;
 
           if (donation.donationStatus !== "REGISTERED") {
-            return "Sin acciones";
+            return (
+              <Typography variant="body2" color="text.secondary">
+                Sin acciones
+              </Typography>
+            );
           }
 
           return (
-            <button
-              type="button"
+            <Button
+              variant="outlined"
+              color="error"
+              size="small"
+              startIcon={<CancelOutlined />}
               disabled={isCancelling}
               onClick={() => void handleCancel(donation.donationId)}
             >
               {isCancelling ? "Cancelando..." : "Cancelar"}
-            </button>
+            </Button>
           );
         },
       },
     ],
-    [cancellingId],
+    [cancellingId, handleCancel],
   );
 
   const table = useMaterialReactTable({
@@ -165,21 +212,137 @@ function Donations() {
         pageSize: 10,
       },
     },
+    localization: {
+      noRecordsToDisplay: "No hay donaciones para mostrar",
+      noResultsFound: "No se encontraron resultados",
+      search: "Buscar",
+      rowsPerPage: "Filas por página",
+      of: "de",
+    },
+    muiTablePaperProps: {
+      elevation: 0,
+      sx: {
+        border: "1px solid",
+        borderColor: "divider",
+        borderRadius: 2,
+        overflow: "hidden",
+      },
+    },
+    muiTableHeadCellProps: {
+      sx: {
+        backgroundColor: "#F7F8FA",
+        color: "#263238",
+        fontWeight: 700,
+      },
+    },
+    muiTableBodyRowProps: {
+      sx: {
+        "&:hover": {
+          backgroundColor: "#FFF5F5",
+        },
+      },
+    },
+    muiSearchTextFieldProps: {
+      placeholder: "Buscar donación...",
+      size: "small",
+      variant: "outlined",
+    },
   });
 
   return (
-    <section>
-      <h2>Mis donaciones</h2>
+    <Box className="donations-page">
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 3,
+        }}
+      >
+        {/* Encabezado */}
+        <Box>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 1.5,
+            }}
+          >
+            <VolunteerActivism
+              sx={{ color: "#D71920", fontSize: 32 }}
+            />
 
-      {error && <p role="alert">{error}</p>}
-      {message && <p role="status">{message}</p>}
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: 700 }}
+              color="#263238"
+            >
+              Mis donaciones
+            </Typography>
+          </Box>
 
-      {!loading && donations.length === 0 ? (
-        <p>Todavía no tenés donaciones registradas.</p>
-      ) : (
-        <MaterialReactTable table={table} />
-      )}
-    </section>
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ mt: 1 }}
+          >
+            Consultá tus inscripciones y el estado de tus donaciones.
+          </Typography>
+        </Box>
+
+        {/* Mensajes */}
+        {error && (
+          <Alert severity="error" onClose={() => setError("")}>
+            {error}
+          </Alert>
+        )}
+
+        {message && (
+          <Alert severity="success" onClose={() => setMessage("")}>
+            {message}
+          </Alert>
+        )}
+
+        {/* Contenido */}
+        {!loading && donations.length === 0 && !error ? (
+          <Paper
+            elevation={0}
+            sx={{
+              p: 5,
+              borderRadius: 2,
+              border: "1px solid",
+              borderColor: "divider",
+              textAlign: "center",
+            }}
+          >
+            <VolunteerActivism
+              sx={{
+                fontSize: 52,
+                color: "#D71920",
+                mb: 1,
+              }}
+            />
+
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              Todavía no tenés donaciones registradas
+            </Typography>
+
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mt: 1 }}
+            >
+              Cuando te inscribas para donar, vas a poder consultar
+              acá el estado y los detalles de tus donaciones.
+            </Typography>
+          </Paper>
+        ) : (
+          <Paper elevation={0} sx={{ borderRadius: 2 }}>
+            <MaterialReactTable table={table} />
+          </Paper>
+        )}
+      </Box>
+    </Box>
   );
 }
 
@@ -197,6 +360,20 @@ function getRequestStatusLabel(
   return labels[status];
 }
 
+// Colores de estados de solicitud
+function getRequestStatusColor(
+  status: MyDonation["requestStatus"],
+): "success" | "info" | "warning" | "error" {
+  const colors = {
+    ACTIVE: "success",
+    FULFILLED: "info",
+    EXPIRED: "warning",
+    CANCELLED: "error",
+  } as const;
+
+  return colors[status];
+}
+
 // Traducción de estados de donación
 function getDonationStatusLabel(
   status: MyDonation["donationStatus"],
@@ -208,6 +385,19 @@ function getDonationStatusLabel(
   };
 
   return labels[status];
+}
+
+// Colores de estados de donación
+function getDonationStatusColor(
+  status: MyDonation["donationStatus"],
+): "warning" | "success" | "error" {
+  const colors = {
+    REGISTERED: "warning",
+    COMPLETED: "success",
+    CANCELLED: "error",
+  } as const;
+
+  return colors[status];
 }
 
 export default Donations;

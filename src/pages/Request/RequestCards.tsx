@@ -10,15 +10,28 @@ import { registerDonation } from "../../services/donationService";
 
 interface RequestCardsProps {
   requests: BloodRequest[];
+  hasPendingDonation: boolean;
+  pendingBloodRequestId: number | null;
+  onDonationRegistered: () => Promise<void>;
 }
 
-function RequestCards({ requests }: RequestCardsProps) {
+function RequestCards({
+  requests,
+  hasPendingDonation,
+  pendingBloodRequestId,
+  onDonationRegistered,
+}: RequestCardsProps) {
   const [registeringId, setRegisteringId] = useState<number | null>(null);
+
   const [messages, setMessages] = useState<
     Record<number, { type: "success" | "error"; text: string }>
   >({});
 
   async function handleRegister(bloodRequestId: number) {
+    if (hasPendingDonation || registeringId !== null) {
+      return;
+    }
+
     setRegisteringId(bloodRequestId);
 
     setMessages((previous) => {
@@ -30,6 +43,9 @@ function RequestCards({ requests }: RequestCardsProps) {
     try {
       await registerDonation(bloodRequestId);
 
+      // Volvemos a consultar las inscripciones del usuario.
+      await onDonationRegistered();
+
       setMessages((previous) => ({
         ...previous,
         [bloodRequestId]: {
@@ -37,12 +53,14 @@ function RequestCards({ requests }: RequestCardsProps) {
           text: "¡Te inscribiste correctamente para donar!",
         },
       }));
-    } catch {
+    } catch (error) {
+      console.error("Error al registrar la donación:", error);
+
       setMessages((previous) => ({
         ...previous,
         [bloodRequestId]: {
           type: "error",
-          text: "No se pudo completar la inscripción. Verificá las condiciones de la solicitud e intentá nuevamente.",
+          text: "No se pudo completar la inscripción. Intentá nuevamente.",
         },
       }));
     } finally {
@@ -59,6 +77,8 @@ function RequestCards({ requests }: RequestCardsProps) {
       {requests.map((request) => {
         const message = messages[request.id];
         const isRegistering = registeringId === request.id;
+        const isCurrentPendingRequest =
+          hasPendingDonation && pendingBloodRequestId === request.id;
 
         return (
           <article key={request.id}>
@@ -99,12 +119,16 @@ function RequestCards({ requests }: RequestCardsProps) {
             {request.status === "ACTIVE" && (
               <button
                 type="button"
-                disabled={isRegistering}
+                disabled={isRegistering || hasPendingDonation}
                 onClick={() => void handleRegister(request.id)}
               >
                 {isRegistering
                   ? "Inscribiendo..."
-                  : "Quiero donar"}
+                  : isCurrentPendingRequest
+                    ? "Ya estás inscripto"
+                    : hasPendingDonation
+                      ? "Ya tenés otra inscripción pendiente"
+                      : "Quiero donar"}
               </button>
             )}
 

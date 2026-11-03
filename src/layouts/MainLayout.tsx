@@ -49,7 +49,7 @@ const navigationItems = [
     icon: <BloodtypeIcon />,
   },
   {
-    label: "Donaciones",
+    label: "Mis Donaciones",
     path: "/donations",
     roles: ["ADMIN", "HEMOADMIN", "USER"],
     icon: <DonationIcon />,

@@ -1,11 +1,34 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
+
+import "../Users.css";
+
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Divider,
+  MenuItem,
+  Paper,
+  TextField,
+  Typography,
+} from "@mui/material";
+
+import {
+  PersonAddOutlined,
+  SaveOutlined,
+  CloseOutlined,
+} from "@mui/icons-material";
+
 import type { User } from "../../../types/User";
+
 import type {
   CreateUserRequest,
   UpdateUserRequest,
 } from "../../../services/userService";
+
 import {
   BLOOD_TYPES,
   RH_FACTORS,
@@ -34,10 +57,12 @@ function UserForm({ user, onSave, onCancel }: UserFormProps) {
     user?.rhFactorId.toString() ?? ""
   );
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
+    setError("");
 
     try {
       if (user) {
@@ -65,139 +90,217 @@ function UserForm({ user, onSave, onCancel }: UserFormProps) {
 
         await onSave(data);
       }
+    } catch {
+      setError(
+        user
+          ? "No se pudieron guardar los cambios del usuario."
+          : "No se pudo crear el usuario. Verificá los datos ingresados."
+      );
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>{user ? "Editar usuario" : "Crear usuario"}</h2>
+    <Paper elevation={0} className="user-form-card">
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1.5,
+          mb: 2,
+        }}
+      >
+        <PersonAddOutlined color="error" fontSize="large" />
 
-      <div>
-        <label htmlFor="firstName">Nombre</label>
-        <input
-          id="firstName"
-          type="text"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          required
-        />
-      </div>
+        <Box>
+          <Typography sx={{ variant: "h5", fontWeight: 700 }}>
+            {user ? "Editar usuario" : "Crear usuario"}
+          </Typography>
 
-      <div>
-        <label htmlFor="lastName">Apellido</label>
-        <input
-          id="lastName"
-          type="text"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          required
-        />
-      </div>
+          <Typography variant="body2" color="text.secondary">
+            {user
+              ? "Modificá los datos personales del usuario."
+              : "Completá los datos para registrar un nuevo usuario."}
+          </Typography>
+        </Box>
+      </Box>
 
-      <div>
-        <label htmlFor="birthDate">Fecha de nacimiento</label>
-        <input
-          id="birthDate"
-          type="date"
-          value={birthDate}
-          max={new Date().toISOString().split("T")[0]}
-          onChange={(e) => setBirthDate(e.target.value)}
-          required
-        />
-      </div>
+      <Divider sx={{ mb: 3 }} />
 
-      {!user && (
-        <>
-          <div>
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password">Contraseña</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              minLength={8}
-              required
-            />
-          </div>
-        </>
+      {error && (
+        <Alert
+          severity="error"
+          sx={{ mb: 3, borderRadius: 2 }}
+          onClose={() => setError("")}
+        >
+          {error}
+        </Alert>
       )}
 
-      <div>
-        <label htmlFor="gender">Género</label>
-        <select
-          id="gender"
-          value={gender}
-          onChange={(e) => setGender(e.target.value)}
-          required
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        noValidate={false}
+      >
+        <Box className="user-form-grid">
+          <TextField
+            label="Nombre"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+            fullWidth
+            disabled={saving}
+          />
+
+          <TextField
+            label="Apellido"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+            fullWidth
+            disabled={saving}
+          />
+
+          <TextField
+            label="Fecha de nacimiento"
+            type="date"
+            value={birthDate}
+            onChange={(e) => setBirthDate(e.target.value)}
+            required
+            fullWidth
+            disabled={saving}
+            slotProps={{
+              inputLabel: {
+                shrink: true,
+              },
+              htmlInput: {
+                max: new Date().toISOString().split("T")[0],
+              },
+            }}
+          />
+
+          {!user && (
+            <>
+              <TextField
+                label="Email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                fullWidth
+                disabled={saving}
+              />
+
+              <TextField
+                label="Contraseña"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                fullWidth
+                disabled={saving}
+                slotProps={{
+                  htmlInput: {
+                    minLength: 8,
+                  },
+                }}
+                helperText="Mínimo 8 caracteres."
+              />
+            </>
+          )}
+
+          <TextField
+            select
+            label="Género"
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+            required
+            fullWidth
+            disabled={saving}
+          >
+            {GENDERS.map((item) => (
+              <MenuItem key={item.value} value={item.value}>
+                {item.label}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <TextField
+            select
+            label="Grupo sanguíneo"
+            value={bloodTypeId}
+            onChange={(e) => setBloodTypeId(e.target.value)}
+            required
+            fullWidth
+            disabled={saving}
+          >
+            {BLOOD_TYPES.map((item) => (
+              <MenuItem key={item.id} value={item.id}>
+                {item.name}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <TextField
+            select
+            label="Factor Rh"
+            value={rhFactorId}
+            onChange={(e) => setRhFactorId(e.target.value)}
+            required
+            fullWidth
+            disabled={saving}
+          >
+            {RH_FACTORS.map((item) => (
+              <MenuItem key={item.id} value={item.id}>
+                {item.name}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
+
+        <Divider sx={{ my: 3 }} />
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 1.5,
+            flexWrap: "wrap",
+          }}
         >
-          <option value="">Seleccionar género</option>
-          {GENDERS.map((item) => (
-            <option key={item.value} value={item.value}>
-              {item.label}
-            </option>
-          ))}
-        </select>
-      </div>
+          <Button
+            variant="outlined"
+            color="inherit"
+            startIcon={<CloseOutlined />}
+            onClick={onCancel}
+            disabled={saving}
+          >
+            Cancelar
+          </Button>
 
-      <div>
-        <label htmlFor="bloodTypeId">Grupo sanguíneo</label>
-        <select
-          id="bloodTypeId"
-          value={bloodTypeId}
-          onChange={(e) => setBloodTypeId(e.target.value)}
-          required
-        >
-          <option value="">Seleccionar grupo</option>
-          {BLOOD_TYPES.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label htmlFor="rhFactorId">Factor Rh</label>
-        <select
-          id="rhFactorId"
-          value={rhFactorId}
-          onChange={(e) => setRhFactorId(e.target.value)}
-          required
-        >
-          <option value="">Seleccionar factor Rh</option>
-          {RH_FACTORS.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <button type="submit" disabled={saving}>
-        {saving
-          ? "Guardando..."
-          : user
-            ? "Guardar cambios"
-            : "Crear usuario"}
-      </button>
-
-      <button type="button" onClick={onCancel} disabled={saving}>
-        Cancelar
-      </button>
-    </form>
+          <Button
+            type="submit"
+            variant="contained"
+            color="error"
+            startIcon={
+              saving ? (
+                <CircularProgress size={18} color="inherit" />
+              ) : (
+                <SaveOutlined />
+              )
+            }
+            disabled={saving}
+          >
+            {saving
+              ? "Guardando..."
+              : user
+                ? "Guardar cambios"
+                : "Crear usuario"}
+          </Button>
+        </Box>
+      </Box>
+    </Paper>
   );
 }
 

@@ -1,6 +1,37 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { MRT_ColumnDef } from "material-react-table";
+
+import "./Users.css";
+
+import {
+  MaterialReactTable,
+  useMaterialReactTable,
+} from "material-react-table";
+import { MRT_Localization_ES } from "material-react-table/locales/es";
+
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Paper,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+
+import {
+  Add,
+  BlockOutlined,
+  CheckCircleOutlined,
+  EditOutlined,
+  ManageAccountsOutlined,
+  PeopleAltOutlined,
+} from "@mui/icons-material";
+
 import type { User } from "../../types/User";
+
 import {
   getUsers,
   activateUser,
@@ -8,12 +39,16 @@ import {
   createUser,
   updateUser,
 } from "../../services/userService";
+
 import type {
   CreateUserRequest,
   UpdateUserRequest,
 } from "../../services/userService";
+
 import UserForm from "./components/UserForm.tsx";
 import UserRoleManager from "./components/UserRoleManager.tsx";
+
+import "./Users.css";
 
 function Users() {
   const [users, setUsers] = useState<User[]>([]);
@@ -127,107 +162,276 @@ function Users() {
       const updatedUsers = await getUsers();
       setUsers(updatedUsers);
     } catch {
-      setError("Los roles se actualizaron, pero no se pudo refrescar el listado.");
+      setError(
+        "Los roles se actualizaron, pero no se pudo refrescar el listado."
+      );
     }
   }
 
+  const columns = useMemo<MRT_ColumnDef<User>[]>(
+    () => [
+      {
+        accessorKey: "id",
+        header: "ID",
+        size: 70,
+      },
+      {
+        id: "fullName",
+        header: "Nombre y apellido",
+        accessorFn: (row) => `${row.firstName} ${row.lastName}`,
+        size: 190,
+      },
+      {
+        accessorKey: "email",
+        header: "Email",
+        size: 220,
+      },
+      {
+        accessorKey: "birthDate",
+        header: "Fecha de nacimiento",
+        size: 150,
+      },
+      {
+        accessorKey: "gender",
+        header: "Género",
+        size: 110,
+      },
+      {
+        id: "bloodGroup",
+        header: "Grupo sanguíneo",
+        accessorFn: (row) =>
+          `${row.bloodTypeName} ${row.rhFactorName}`,
+        size: 140,
+      },
+      {
+        id: "roles",
+        header: "Roles",
+        accessorFn: (row) => row.roles.join(", "),
+        Cell: ({ row }) => (
+          <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
+            {row.original.roles.map((role) => (
+              <Chip
+                key={role}
+                label={role}
+                size="small"
+                variant="outlined"
+                color="default"
+              />
+            ))}
+          </Box>
+        ),
+        size: 180,
+      },
+      {
+        accessorKey: "status",
+        header: "Estado",
+        Cell: ({ cell }) => {
+          const active = Boolean(cell.getValue());
+
+          return (
+            <Chip
+              label={active ? "Activo" : "Inactivo"}
+              color={active ? "success" : "default"}
+              size="small"
+              icon={
+                active ? (
+                  <CheckCircleOutlined />
+                ) : (
+                  <BlockOutlined />
+                )
+              }
+              variant="outlined"
+            />
+          );
+        },
+        size: 110,
+      },
+      {
+        id: "actions",
+        header: "Acciones",
+        enableColumnFilter: false,
+        enableSorting: false,
+        size: 190,
+        Cell: ({ row }) => {
+          const user = row.original;
+          const updating = updatingId === user.id;
+
+          return (
+            <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+              <Tooltip title="Editar usuario">
+                <span>
+                  <Button
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    onClick={() => handleEdit(user)}
+                  >
+                    <EditOutlined fontSize="small" />
+                  </Button>
+                </span>
+              </Tooltip>
+
+              <Tooltip title={user.status ? "Desactivar usuario" : "Activar usuario"}>
+                <span>
+                  <Button
+                    size="small"
+                    color={user.status ? "error" : "success"}
+                    variant="outlined"
+                    disabled={updating}
+                    onClick={() => void handleStatusChange(user)}
+                  >
+                    {updating ? (
+                      <CircularProgress size={18} />
+                    ) : user.status ? (
+                      <BlockOutlined fontSize="small" />
+                    ) : (
+                      <CheckCircleOutlined fontSize="small" />
+                    )}
+                  </Button>
+                </span>
+              </Tooltip>
+
+              <Tooltip title="Gestionar roles">
+                <Button
+                  size="small"
+                  color="secondary"
+                  variant="outlined"
+                  onClick={() => {
+                    setSelectedUserForRoles(user);
+                    setError("");
+                  }}
+                >
+                  <ManageAccountsOutlined fontSize="small" />
+                </Button>
+              </Tooltip>
+            </Box>
+          );
+        },
+      },
+    ],
+    [updatingId]
+  );
+
+  const table = useMaterialReactTable({
+    columns,
+    data: users,
+    enableColumnFilters: true,
+    enableGlobalFilter: true,
+    enableSorting: true,
+    enablePagination: true,
+    initialState: {
+      density: "comfortable",
+      pagination: {
+        pageIndex: 0,
+        pageSize: 10,
+      },
+    },
+    muiTablePaperProps: {
+      elevation: 0,
+      sx: {
+        border: "1px solid",
+        borderColor: "divider",
+        borderRadius: 3,
+        overflow: "hidden",
+      },
+    },
+    muiTableHeadCellProps: {
+      sx: {
+        backgroundColor: "grey.50",
+        fontWeight: 700,
+      },
+    },
+    muiTableBodyRowProps: {
+      sx: {
+        "&:hover": {
+          backgroundColor: "action.hover",
+        },
+      },
+    },
+    localization: MRT_Localization_ES,
+  });
+
   if (loading) {
-    return <p>Cargando usuarios...</p>;
+    return (
+      <Box className="users-page users-loading">
+        <CircularProgress color="error" />
+        <Typography color="text.secondary">
+          Cargando usuarios...
+        </Typography>
+      </Box>
+    );
   }
 
   return (
-    <section>
-      <h1>Gestión de usuarios</h1>
+    <Box className="users-page">
+      <Box className="users-header">
+        <Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+            <PeopleAltOutlined color="error" fontSize="large" />
+            <Typography variant="h4" sx={{ fontWeight: 700 }}>
+              Gestión de usuarios
+            </Typography>
+          </Box>
 
-      <p>Administrá los usuarios registrados en Donar+.</p>
+          <Typography color="text.secondary">
+            Administrá los usuarios registrados en Donar+.
+          </Typography>
+        </Box>
 
-      {error && <p role="alert">{error}</p>}
+        {!showForm && (
+          <Button
+            variant="contained"
+            color="error"
+            startIcon={<Add />}
+            onClick={handleCreate}
+          >
+            Crear usuario
+          </Button>
+        )}
+      </Box>
 
-      {!showForm ? (
-        <button type="button" onClick={handleCreate}>
-          Crear usuario
-        </button>
-      ) : (
-        <UserForm
-          key={editingUser?.id ?? "new"}
-          user={editingUser}
-          onSave={handleSave}
-          onCancel={() => {
-            setShowForm(false);
-            setEditingUser(null);
-            setError("");
-          }}
-        />
+      {error && (
+        <Alert
+          severity="error"
+          onClose={() => setError("")}
+          sx={{ mb: 3, borderRadius: 2 }}
+        >
+          {error}
+        </Alert>
       )}
 
-      {!showForm && (
+      {showForm ? (
+        <Paper className="users-form-paper" elevation={0}>
+          <UserForm
+            key={editingUser?.id ?? "new"}
+            user={editingUser}
+            onSave={handleSave}
+            onCancel={() => {
+              setShowForm(false);
+              setEditingUser(null);
+              setError("");
+            }}
+          />
+        </Paper>
+      ) : (
         <>
-          {users.length === 0 ? (
-            <p>No hay usuarios registrados.</p>
-          ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Nombre y apellido</th>
-                    <th>Email</th>
-                    <th>Fecha de nacimiento</th>
-                    <th>Género</th>
-                    <th>Grupo sanguíneo</th>
-                    <th>Roles</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {users.map((user) => (
-                    <tr key={user.id}>
-                      <td>{user.id}</td>
-                      <td>{user.firstName} {user.lastName}</td>
-                      <td>{user.email}</td>
-                      <td>{user.birthDate}</td>
-                      <td>{user.gender}</td>
-                      <td>{user.bloodTypeName} {user.rhFactorName}</td>
-                      <td>{user.roles.join(", ")}</td>
-                      <td>{user.status ? "Activo" : "Inactivo"}</td>
-                      <td>
-                        <button
-                          type="button"
-                          onClick={() => handleEdit(user)}
-                        >
-                          Editar
-                        </button>
-
-                        <button
-                          type="button"
-                          disabled={updatingId === user.id}
-                          onClick={() => void handleStatusChange(user)}
-                        >
-                          {updatingId === user.id
-                            ? "Actualizando..."
-                            : user.status
-                              ? "Desactivar"
-                              : "Activar"}
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedUserForRoles(user);
-                            setError("");
-                          }}
-                        >
-                          Gestionar roles
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <Paper className="users-table-paper" elevation={0}>
+            {users.length === 0 ? (
+              <Box className="users-empty">
+                <PeopleAltOutlined
+                  sx={{ fontSize: 52, color: "text.disabled" }}
+                />
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  No hay usuarios registrados
+                </Typography>
+                <Typography color="text.secondary">
+                  Cuando se registren usuarios, aparecerán en este listado.
+                </Typography>
+              </Box>
+            ) : (
+              <MaterialReactTable table={table} />
+            )}
+          </Paper>
 
           {selectedUserForRoles && (
             <UserRoleManager
@@ -239,7 +443,7 @@ function Users() {
           )}
         </>
       )}
-    </section>
+    </Box>
   );
 }
 

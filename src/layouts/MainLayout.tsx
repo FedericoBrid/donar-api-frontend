@@ -55,13 +55,13 @@ const navigationItems = [
     icon: <DonationIcon />,
   },
   {
-    label: "Hemocentros",
+    label: "Gestión de Hemocentros",
     path: "/blood-centers",
     roles: ["ADMIN", "HEMOADMIN"],
     icon: <HospitalIcon />,
   },
   {
-    label: "Usuarios",
+    label: "Gestión de Usuarios",
     path: "/users",
     roles: ["ADMIN"],
     icon: <PeopleIcon />,

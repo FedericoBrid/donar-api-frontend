@@ -1,10 +1,39 @@
 
 import { useEffect, useState } from "react";
+
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Divider,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
+
+import {
+  AdminPanelSettingsOutlined,
+  CheckCircleOutlined,
+  CloseOutlined,
+  PersonOutlined,
+  SecurityOutlined,
+  ToggleOffOutlined,
+  ToggleOnOutlined,
+} from "@mui/icons-material";
+
 import {
   getUserRoles,
   assignRole,
   deactivateRole,
 } from "../../../services/userService";
+
 import type { UserRole } from "../../../services/userService";
 
 interface UserRoleManagerProps {
@@ -15,9 +44,9 @@ interface UserRoleManagerProps {
 }
 
 const AVAILABLE_ROLES = [
-  { id: 1, name: "ADMIN" },
-  { id: 2, name: "HEMOADMIN" },
-  { id: 3, name: "USER" },
+  { id: 1, name: "ADMIN", description: "Administración completa" },
+  { id: 2, name: "HEMOADMIN", description: "Gestión de hemocentros y solicitudes" },
+  { id: 3, name: "USER", description: "Acceso de usuario" },
 ];
 
 export default function UserRoleManager({
@@ -103,49 +132,113 @@ export default function UserRoleManager({
     return role.status ? "Desactivar" : "Reactivar";
   }
 
-  return (
-    <section className="card mt-4">
-      <div className="card-header d-flex justify-content-between align-items-center">
-        <div>
-          <h5 className="mb-0">Gestión de roles</h5>
-          <small className="text-muted">{userName}</small>
-        </div>
+  function getRoleIcon(roleName: string) {
+    switch (roleName) {
+      case "ADMIN":
+        return <AdminPanelSettingsOutlined />;
+      case "HEMOADMIN":
+        return <SecurityOutlined />;
+      default:
+        return <PersonOutlined />;
+    }
+  }
 
-        <button
-          type="button"
-          className="btn btn-outline-secondary btn-sm"
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        mt: 3,
+        border: "1px solid",
+        borderColor: "divider",
+        borderRadius: 3,
+        overflow: "hidden",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 2,
+          p: 2.5,
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          <SecurityOutlined color="error" fontSize="large" />
+
+          <Box>
+            <Typography sx={{ variant: "h6", fontWeight: 700 }}>
+              Gestión de roles
+            </Typography>
+
+            <Typography sx={{ variant: "body2", color: "text.secondary" }}>
+              {userName}
+            </Typography>
+          </Box>
+        </Box>
+
+        <Button
+          variant="outlined"
+          color="inherit"
+          size="small"
+          startIcon={<CloseOutlined />}
           onClick={onClose}
         >
           Cerrar
-        </button>
-      </div>
+        </Button>
+      </Box>
 
-      <div className="card-body">
+      <Divider />
+
+      <Box sx={{ p: 2.5 }}>
         {error && (
-          <div className="alert alert-danger" role="alert">
+          <Alert
+            severity="error"
+            sx={{ mb: 2, borderRadius: 2 }}
+            onClose={() => setError("")}
+          >
             {error}
-          </div>
+          </Alert>
         )}
 
         {loading ? (
-          <p>Cargando roles...</p>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: 2,
+              py: 4,
+            }}
+          >
+            <CircularProgress size={24} color="error" />
+            <Typography color="text.secondary">
+              Cargando roles...
+            </Typography>
+          </Box>
         ) : (
           <>
-            <p className="text-muted">
+            <Typography
+              color="text.secondary"
+              variant="body2"
+              sx={{ mb: 2 }}
+            >
               Un usuario puede tener varios roles activos simultáneamente.
-            </p>
+              Administrá los permisos asignados desde esta sección.
+            </Typography>
 
-            <div className="table-responsive">
-              <table className="table table-striped align-middle">
-                <thead>
-                  <tr>
-                    <th>Rol</th>
-                    <th>Estado</th>
-                    <th>Acción</th>
-                  </tr>
-                </thead>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Rol</TableCell>
+                    <TableCell>Descripción</TableCell>
+                    <TableCell>Estado</TableCell>
+                    <TableCell align="right">Acción</TableCell>
+                  </TableRow>
+                </TableHead>
 
-                <tbody>
+                <TableBody>
                   {AVAILABLE_ROLES.map((availableRole) => {
                     const status = getRoleStatus(availableRole.id);
                     const isActive = status === "Activo";
@@ -153,50 +246,74 @@ export default function UserRoleManager({
                       updatingRoleId === availableRole.id;
 
                     return (
-                      <tr key={availableRole.id}>
-                        <td>{availableRole.name}</td>
+                      <TableRow key={availableRole.id} hover>
+                        <TableCell>
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            {getRoleIcon(availableRole.name)}
 
-                        <td>
-                          <span
-                            className={`badge ${
+                            <Typography sx={{ fontWeight: 600 }}>
+                              {availableRole.name}
+                            </Typography>
+                          </Box>
+                        </TableCell>
+
+                        <TableCell>
+                          <Typography variant="body2" color="text.secondary">
+                            {availableRole.description}
+                          </Typography>
+                        </TableCell>
+
+                        <TableCell>
+                          <Chip
+                            label={status}
+                            size="small"
+                            color={
                               isActive
-                                ? "bg-success"
+                                ? "success"
                                 : status === "Inactivo"
-                                  ? "bg-secondary"
-                                  : "bg-light text-dark"
-                            }`}
-                          >
-                            {status}
-                          </span>
-                        </td>
+                                  ? "default"
+                                  : "warning"
+                            }
+                            variant="outlined"
+                            icon={
+                              isActive ? <CheckCircleOutlined /> : undefined
+                            }
+                          />
+                        </TableCell>
 
-                        <td>
-                          <button
-                            type="button"
-                            className={`btn btn-sm ${
-                              isActive
-                                ? "btn-outline-danger"
-                                : "btn-outline-primary"
-                            }`}
+                        <TableCell align="right">
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            color={isActive ? "error" : "primary"}
                             disabled={updatingRoleId !== null}
+                            startIcon={
+                              isUpdating ? (
+                                <CircularProgress size={16} />
+                              ) : isActive ? (
+                                <ToggleOffOutlined />
+                              ) : (
+                                <ToggleOnOutlined />
+                              )
+                            }
                             onClick={() =>
-                              handleRoleChange(availableRole.id)
+                              void handleRoleChange(availableRole.id)
                             }
                           >
                             {isUpdating
                               ? "Procesando..."
                               : getActionLabel(availableRole.id)}
-                          </button>
-                        </td>
-                      </tr>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
                     );
                   })}
-                </tbody>
-              </table>
-            </div>
+                </TableBody>
+              </Table>
+            </TableContainer>
           </>
         )}
-      </div>
-    </section>
+      </Box>
+    </Paper>
   );
 }

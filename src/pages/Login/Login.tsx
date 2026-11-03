@@ -1,69 +1,159 @@
+
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  InputAdornment,
+  Paper,
+  TextField,
+  Typography,
+} from "@mui/material";
+import {
+  EmailOutlined,
+  LockOutlined,
+  VolunteerActivismOutlined,
+} from "@mui/icons-material";
+
+import "./Login.css";
+
 import { useAuth } from "../../context/useAuth";
 import type { AuthResponse } from "../../types/auth";
 import api from "../../services/api";
-import { useNavigate } from "react-router-dom";
+import "./Login.css";
 
 function Login() {
-
-  const {login} = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
     setError("");
-    try{
+    setLoading(true);
+
+    try {
       const response = await api.post<AuthResponse>("/auth/login", {
         email,
         password,
       });
-  
+
       await login(response.data);
-  
       navigate("/dashboard");
     } catch {
-      setError("Credenciales inválidas");
+      setError("Credenciales inválidas. Verificá tu email y contraseña.");
+    } finally {
+      setLoading(false);
     }
-
   };
 
   return (
-    <div>
-      <h1>Donar+</h1>
-      {error && <p>{error}</p>}
+    <Box className="login-page">
+      <Paper className="login-card" elevation={0}>
+        <Box className="login-brand">
+          <Box className="login-logo">
+            <VolunteerActivismOutlined />
+          </Box>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
+          <Typography sx={{ variant: "h4", fontWeight: 800 }}>
+            Donar<span>+</span>
+          </Typography>
+
+          <Typography sx={{ color: "text.secondary", textAlign: "center" }}>
+            Donar sangre es dar vida.
+          </Typography>
+        </Box>
+
+        <Box className="login-heading">
+          <Typography sx={{ variant: "h5", fontWeight: 700 }}>
+            ¡Bienvenido!
+          </Typography>
+
+          <Typography color="text.secondary" variant="body2">
+            Ingresá tus datos para continuar.
+          </Typography>
+        </Box>
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        <Box component="form" onSubmit={handleSubmit} className="login-form">
+          <TextField
+            label="Email"
             type="email"
-            placeholder="Email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
+            placeholder="nombre@ejemplo.com"
+            autoComplete="email"
+            required
+            fullWidth
+            disabled={loading}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <EmailOutlined color="action" />
+                  </InputAdornment>
+                ),
+              },
+            }}
           />
-        </div>
 
-        <div>
-          <label htmlFor="password">Contraseña</label>
-          <input
-            id="password"
+          <TextField
+            label="Contraseña"
             type="password"
-            placeholder="Contraseña"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
+            placeholder="Ingresá tu contraseña"
+            autoComplete="current-password"
+            required
+            fullWidth
+            disabled={loading}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockOutlined color="action" />
+                  </InputAdornment>
+                ),
+              },
+            }}
           />
-        </div>
 
-        <button type="submit">
-          Iniciar sesión
-        </button>
-      </form>
-    </div>
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            disabled={loading || !email.trim() || !password}
+            className="login-submit"
+          >
+            {loading ? (
+              <>
+                <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
+                Ingresando...
+              </>
+            ) : (
+              "Iniciar sesión"
+            )}
+          </Button>
+        </Box>
+
+        <Typography className="login-footer" variant="caption">
+          Donar+ · Sistema de gestión de donaciones de sangre
+        </Typography>
+      </Paper>
+    </Box>
   );
 }
 

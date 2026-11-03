@@ -1,0 +1,88 @@
+.blood-centers-page {
+  width: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.blood-centers-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.blood-centers-table-paper,
+.blood-center-form-paper {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.blood-center-form-paper {
+  padding: 24px;
+}
+
+.blood-center-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.blood-center-form-actions {
+  grid-column: 1 / -1;
+  margin-top: 8px;
+}
+
+.blood-centers-loading {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.blood-centers-empty {
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .blood-centers-page {
+    padding: 16px;
+  }
+
+  .blood-centers-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .blood-centers-header button {
+    width: 100%;
+  }
+
+  .blood-center-form-paper {
+    padding: 16px;
+  }
+
+  .blood-center-form-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .blood-center-form-actions {
+    flex-direction: column;
+  }
+
+  .blood-center-form-actions button {
+    width: 100%;
+  }
+}

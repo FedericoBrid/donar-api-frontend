@@ -1,5 +1,40 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { MRT_ColumnDef } from "material-react-table";
+import {
+  MaterialReactTable,
+  useMaterialReactTable,
+} from "material-react-table";
+import { MRT_Localization_ES } from "material-react-table/locales/es";
+
+import "./BloodCenters.css";
+
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Divider,
+  MenuItem,
+  Paper,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+
+import {
+  Add,
+  BusinessOutlined,
+  EditOutlined,
+  CheckCircleOutlined,
+  BlockOutlined,
+  SaveOutlined,
+  CloseOutlined,
+  PublicOutlined,
+  LocationOnOutlined,
+} from "@mui/icons-material";
+
 import {
   getBloodCenters,
   createBloodCenter,
@@ -7,11 +42,14 @@ import {
   activateBloodCenter,
   deactivateBloodCenter,
 } from "../../services/bloodCenterService";
+
 import type {
   BloodCenter,
   CreateBloodCenterRequest,
   UpdateBloodCenterRequest,
 } from "../../types/BloodCenter";
+
+import "./BloodCenters.css";
 
 const EMPTY_FORM: CreateBloodCenterRequest = {
   name: "",
@@ -38,6 +76,7 @@ function BloodCenters() {
     async function loadCenters() {
       try {
         const data = await getBloodCenters();
+
         if (active) setCenters(data);
       } catch {
         if (active) {
@@ -85,7 +124,7 @@ function BloodCenters() {
   }
 
   function handleInputChange(
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
     const { name, value } = event.target;
 
@@ -112,9 +151,11 @@ function BloodCenters() {
             center.id === updated.id ? updated : center
           )
         );
+
         setSuccess("Hemocentro actualizado correctamente.");
       } else {
         const created = await createBloodCenter(form);
+
         setCenters((previous) => [...previous, created]);
         setSuccess("Hemocentro creado correctamente.");
       }
@@ -144,7 +185,9 @@ function BloodCenters() {
         : await activateBloodCenter(center.id);
 
       setCenters((previous) =>
-        previous.map((item) => (item.id === updated.id ? updated : item))
+        previous.map((item) =>
+          item.id === updated.id ? updated : item
+        )
       );
 
       setSuccess(
@@ -159,159 +202,381 @@ function BloodCenters() {
     }
   }
 
+  const columns = useMemo<MRT_ColumnDef<BloodCenter>[]>(
+    () => [
+      {
+        accessorKey: "id",
+        header: "ID",
+        size: 70,
+      },
+      {
+        accessorKey: "name",
+        header: "Nombre",
+        size: 190,
+      },
+      {
+        accessorKey: "address",
+        header: "Dirección",
+        size: 220,
+        Cell: ({ cell }) => (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <LocationOnOutlined
+              fontSize="small"
+              color="action"
+            />
+            {cell.getValue<string>()}
+          </Box>
+        ),
+      },
+      {
+        accessorKey: "phone",
+        header: "Teléfono",
+        size: 140,
+      },
+      {
+        accessorKey: "email",
+        header: "Email",
+        size: 200,
+      },
+      {
+        accessorKey: "isPublic",
+        header: "Tipo",
+        Cell: ({ cell }) => {
+          const isPublic = Boolean(cell.getValue());
+
+          return (
+            <Chip
+              label={isPublic ? "Público" : "Privado"}
+              size="small"
+              color={isPublic ? "info" : "default"}
+              variant="outlined"
+              icon={<PublicOutlined />}
+            />
+          );
+        },
+        size: 120,
+      },
+      {
+        accessorKey: "status",
+        header: "Estado",
+        Cell: ({ cell }) => {
+          const active = Boolean(cell.getValue());
+
+          return (
+            <Chip
+              label={active ? "Activo" : "Inactivo"}
+              size="small"
+              color={active ? "success" : "default"}
+              variant="outlined"
+              icon={
+                active ? (
+                  <CheckCircleOutlined />
+                ) : (
+                  <BlockOutlined />
+                )
+              }
+            />
+          );
+        },
+        size: 110,
+      },
+      {
+        id: "actions",
+        header: "Acciones",
+        enableColumnFilter: false,
+        enableSorting: false,
+        size: 130,
+        Cell: ({ row }) => {
+          const center = row.original;
+          const updating = updatingId === center.id;
+
+          return (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+              <Tooltip title="Editar hemocentro">
+                <Button
+                  size="small"
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => handleEdit(center)}
+                >
+                  <EditOutlined fontSize="small" />
+                </Button>
+              </Tooltip>
+
+              <Tooltip
+                title={
+                  center.status
+                    ? "Desactivar hemocentro"
+                    : "Activar hemocentro"
+                }
+              >
+                <span>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    color={center.status ? "error" : "success"}
+                    disabled={updating}
+                    onClick={() => void handleStatusChange(center)}
+                  >
+                    {updating ? (
+                      <CircularProgress size={18} />
+                    ) : center.status ? (
+                      <BlockOutlined fontSize="small" />
+                    ) : (
+                      <CheckCircleOutlined fontSize="small" />
+                    )}
+                  </Button>
+                </span>
+              </Tooltip>
+            </Box>
+          );
+        },
+      },
+    ],
+    [updatingId]
+  );
+
+  const table = useMaterialReactTable({
+    columns,
+    data: centers,
+    localization: MRT_Localization_ES,
+    enableColumnFilters: true,
+    enableGlobalFilter: true,
+    enableSorting: true,
+    enablePagination: true,
+    initialState: {
+      density: "comfortable",
+      pagination: {
+        pageIndex: 0,
+        pageSize: 10,
+      },
+    },
+    muiTablePaperProps: {
+      elevation: 0,
+      sx: {
+        borderRadius: 3,
+        overflow: "hidden",
+      },
+    },
+    muiTableHeadCellProps: {
+      sx: {
+        backgroundColor: "grey.50",
+        fontWeight: 700,
+      },
+    },
+    muiTableBodyRowProps: {
+      sx: {
+        "&:hover": {
+          backgroundColor: "action.hover",
+        },
+      },
+    },
+  });
+
   if (loading) {
-    return <p>Cargando hemocentros...</p>;
+    return (
+      <Box className="blood-centers-page blood-centers-loading">
+        <CircularProgress color="error" />
+        <Typography color="text.secondary">
+          Cargando hemocentros...
+        </Typography>
+      </Box>
+    );
   }
 
   return (
-    <section>
-      <h1>Gestión de hemocentros</h1>
-      <p>Administrá los hemocentros registrados en Donar+.</p>
+    <Box className="blood-centers-page">
+      <Box className="blood-centers-header">
+        <Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+            <BusinessOutlined color="error" fontSize="large" />
 
-      {error && <p role="alert">{error}</p>}
-      {success && <p role="status">{success}</p>}
+            <Typography variant="h4" sx={{ fontWeight: 700 }}>
+              Gestión de hemocentros
+            </Typography>
+          </Box>
 
-      {!showForm ? (
-        <button type="button" onClick={handleCreate}>
-          Crear hemocentro
-        </button>
-      ) : (
-        <form onSubmit={handleSave}>
-          <h2>
-            {editingCenter ? "Editar hemocentro" : "Nuevo hemocentro"}
-          </h2>
+          <Typography color="text.secondary">
+            Administrá los hemocentros registrados en Donar+.
+          </Typography>
+        </Box>
 
-          <div>
-            <label htmlFor="name">Nombre</label>
-            <input
-              id="name"
+        {!showForm && (
+          <Button
+            variant="contained"
+            color="error"
+            startIcon={<Add />}
+            onClick={handleCreate}
+          >
+            Crear hemocentro
+          </Button>
+        )}
+      </Box>
+
+      {error && (
+        <Alert
+          severity="error"
+          sx={{ mb: 2, borderRadius: 2 }}
+          onClose={() => setError("")}
+        >
+          {error}
+        </Alert>
+      )}
+
+      {success && (
+        <Alert
+          severity="success"
+          sx={{ mb: 2, borderRadius: 2 }}
+          onClose={() => setSuccess("")}
+        >
+          {success}
+        </Alert>
+      )}
+
+      {showForm ? (
+        <Paper
+          elevation={0}
+          className="blood-center-form-paper"
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
+            <BusinessOutlined color="error" fontSize="large" />
+
+            <Box>
+              <Typography sx={{ variant: "h5", fontWeight: 700 }}>
+                {editingCenter ? "Editar hemocentro" : "Nuevo hemocentro"}
+              </Typography>
+
+              <Typography sx={{ variant: "body2", color: "text.secondary" }}>
+                Completá los datos del establecimiento.
+              </Typography>
+            </Box>
+          </Box>
+
+          <Divider sx={{ mb: 3 }} />
+
+          <Box
+            component="form"
+            onSubmit={handleSave}
+            className="blood-center-form-grid"
+          >
+            <TextField
+              label="Nombre"
               name="name"
               value={form.name}
               onChange={handleInputChange}
               required
+              fullWidth
+              disabled={saving}
             />
-          </div>
 
-          <div>
-            <label htmlFor="address">Dirección</label>
-            <input
-              id="address"
+            <TextField
+              label="Dirección"
               name="address"
               value={form.address}
               onChange={handleInputChange}
               required
+              fullWidth
+              disabled={saving}
             />
-          </div>
 
-          <div>
-            <label htmlFor="phone">Teléfono</label>
-            <input
-              id="phone"
+            <TextField
+              label="Teléfono"
               name="phone"
               type="tel"
               value={form.phone}
               onChange={handleInputChange}
               required
+              fullWidth
+              disabled={saving}
             />
-          </div>
 
-          <div>
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
+            <TextField
+              label="Email"
               name="email"
               type="email"
               value={form.email}
               onChange={handleInputChange}
               required
+              fullWidth
+              disabled={saving}
             />
-          </div>
 
-          <div>
-            <label htmlFor="isPublic">Tipo de hemocentro</label>
-            <select
-              id="isPublic"
+            <TextField
+              select
+              label="Tipo de hemocentro"
               name="isPublic"
               value={String(form.isPublic)}
               onChange={handleInputChange}
               required
+              fullWidth
+              disabled={saving}
             >
-              <option value="true">Público</option>
-              <option value="false">Privado</option>
-            </select>
-          </div>
+              <MenuItem value="true">Público</MenuItem>
+              <MenuItem value="false">Privado</MenuItem>
+            </TextField>
 
-          <button type="submit" disabled={saving}>
-            {saving
-              ? "Guardando..."
-              : editingCenter
-                ? "Guardar cambios"
-                : "Crear"}
-          </button>
+            <Box
+              className="blood-center-form-actions"
+              sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5 }}
+            >
+              <Button
+                type="button"
+                variant="outlined"
+                color="inherit"
+                startIcon={<CloseOutlined />}
+                onClick={handleCancel}
+                disabled={saving}
+              >
+                Cancelar
+              </Button>
 
-          <button type="button" onClick={handleCancel} disabled={saving}>
-            Cancelar
-          </button>
-        </form>
+              <Button
+                type="submit"
+                variant="contained"
+                color="error"
+                startIcon={
+                  saving ? (
+                    <CircularProgress size={18} color="inherit" />
+                  ) : (
+                    <SaveOutlined />
+                  )
+                }
+                disabled={saving}
+              >
+                {saving
+                  ? "Guardando..."
+                  : editingCenter
+                    ? "Guardar cambios"
+                    : "Crear hemocentro"}
+              </Button>
+            </Box>
+          </Box>
+        </Paper>
+      ) : (
+        <Paper
+          elevation={0}
+          className="blood-centers-table-paper"
+        >
+          {centers.length === 0 ? (
+            <Box className="blood-centers-empty">
+              <BusinessOutlined
+                sx={{ fontSize: 52, color: "text.disabled" }}
+              />
+
+              <Typography sx={{ variant: "h6", fontWeight: 600 }}>
+                No hay hemocentros registrados
+              </Typography>
+
+              <Typography color="text.secondary">
+                Cuando registres un hemocentro, aparecerá en este listado.
+              </Typography>
+            </Box>
+          ) : (
+            <MaterialReactTable table={table} />
+          )}
+        </Paper>
       )}
-
-      {!showForm && (
-        centers.length === 0 ? (
-          <p>No hay hemocentros registrados.</p>
-        ) : (
-          <div style={{ overflowX: "auto" }}>
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nombre</th>
-                  <th>Dirección</th>
-                  <th>Teléfono</th>
-                  <th>Email</th>
-                  <th>Tipo</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {centers.map((center) => (
-                  <tr key={center.id}>
-                    <td>{center.id}</td>
-                    <td>{center.name}</td>
-                    <td>{center.address}</td>
-                    <td>{center.phone}</td>
-                    <td>{center.email}</td>
-                    <td>{center.isPublic ? "Público" : "Privado"}</td>
-                    <td>{center.status ? "Activo" : "Inactivo"}</td>
-                    <td>
-                      <button
-                        type="button"
-                        onClick={() => handleEdit(center)}
-                      >
-                        Editar
-                      </button>
-
-                      <button
-                        type="button"
-                        disabled={updatingId === center.id}
-                        onClick={() => void handleStatusChange(center)}
-                      >
-                        {updatingId === center.id
-                          ? "Actualizando..."
-                          : center.status
-                            ? "Desactivar"
-                            : "Activar"}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )
-      )}
-    </section>
+    </Box>
   );
 }
 

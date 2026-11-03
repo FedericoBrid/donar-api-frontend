@@ -1,0 +1,154 @@
+.requests-page {
+  width: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.requests-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.requests-view-selector {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.requests-view-selector .MuiToggleButton-root {
+  text-transform: none;
+  font-weight: 600;
+  padding: 9px 16px;
+}
+
+.requests-loading {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.requests-empty {
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.request-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: 20px;
+}
+
+.request-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px !important;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.request-card:hover {
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
+  transform: translateY(-2px);
+}
+
+.request-card-content {
+  padding: 20px !important;
+}
+
+.request-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.request-blood-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #D71920;
+}
+
+.request-card-information {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 0;
+}
+
+.request-info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.request-info-row > .MuiSvgIcon-root {
+  margin-top: 3px;
+}
+
+.request-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.requests-table-container {
+  width: 100%;
+  border-radius: 12px;
+}
+
+@media (max-width: 600px) {
+  .requests-page {
+    padding: 16px;
+  }
+
+  .requests-header {
+    align-items: flex-start;
+  }
+
+  .requests-view-selector {
+    justify-content: stretch;
+  }
+
+  .requests-view-selector .MuiToggleButtonGroup-root {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .requests-view-selector .MuiToggleButton-root {
+    width: 100%;
+  }
+
+  .request-card-content {
+    padding: 16px !important;
+  }
+
+  .request-card-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .request-card-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .request-card-footer button {
+    width: 100%;
+  }
+}

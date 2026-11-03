@@ -1,5 +1,25 @@
 
 import { useState } from "react";
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  Divider,
+  Paper,
+  Typography,
+} from "@mui/material";
+import {
+  BloodtypeOutlined,
+  CalendarMonthOutlined,
+  CheckCircleOutlined,
+  LocationOnOutlined,
+  PhoneOutlined,
+  VolunteerActivismOutlined,
+} from "@mui/icons-material";
+
 import type { BloodRequest } from "../../types/BloodRequest";
 import {
   formatDate,
@@ -42,8 +62,6 @@ function RequestCards({
 
     try {
       await registerDonation(bloodRequestId);
-
-      // Volvemos a consultar las inscripciones del usuario.
       await onDonationRegistered();
 
       setMessages((previous) => ({
@@ -69,80 +87,145 @@ function RequestCards({
   }
 
   if (requests.length === 0) {
-    return <p>No hay solicitudes disponibles.</p>;
+    return (
+      <Paper className="requests-empty">
+        <BloodtypeOutlined sx={{ fontSize: 48, color: "text.secondary" }} />
+        <Typography sx={{ variant: "h6", fontWeight: 600 }}>
+          No hay solicitudes disponibles
+        </Typography>
+        <Typography color="text.secondary">
+          Cuando haya nuevas solicitudes de sangre, aparecerán en esta sección.
+        </Typography>
+      </Paper>
+    );
   }
 
   return (
-    <div>
+    <Box className="request-cards-grid">
       {requests.map((request) => {
         const message = messages[request.id];
         const isRegistering = registeringId === request.id;
         const isCurrentPendingRequest =
           hasPendingDonation && pendingBloodRequestId === request.id;
 
+        const urgencyColor =
+          request.urgency === "CRITICAL"
+            ? "error"
+            : request.urgency === "HIGH"
+              ? "warning"
+              : request.urgency === "MEDIUM"
+                ? "info"
+                : "success";
+
         return (
-          <article key={request.id}>
-            <h3>
-              {request.bloodTypeName} {request.rhFactorName}
-            </h3>
+          <Card key={request.id} className="request-card" elevation={0}>
+            <CardContent className="request-card-content">
+              <Box className="request-card-header">
+                <Box className="request-blood-group">
+                  <BloodtypeOutlined />
+                  <Typography sx={{ variant: "h5", fontWeight: 800 }}>
+                    {request.bloodTypeName} {request.rhFactorName}
+                  </Typography>
+                </Box>
 
-            <p>
-              <strong>Hemocentro:</strong>{" "}
-              {request.bloodCenterName}
-            </p>
+                <Chip
+                  label={getUrgencyLabel(request.urgency)}
+                  color={urgencyColor}
+                  size="small"
+                  variant="outlined"
+                />
+              </Box>
 
-            <p>
-              <strong>Dirección:</strong>{" "}
-              {request.bloodCenterAddress}
-            </p>
+              <Divider />
 
-            <p>
-              <strong>Teléfono:</strong>{" "}
-              {request.bloodCenterPhone}
-            </p>
+              <Box className="request-card-information">
+                <Box className="request-info-row">
+                  <LocationOnOutlined color="action" />
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">
+                      Hemocentro
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600 }}>
+                      {request.bloodCenterName}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {request.bloodCenterAddress}
+                    </Typography>
+                  </Box>
+                </Box>
 
-            <p>
-              <strong>Urgencia:</strong>{" "}
-              {getUrgencyLabel(request.urgency)}
-            </p>
+                <Box className="request-info-row">
+                  <PhoneOutlined color="action" />
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">
+                      Teléfono
+                    </Typography>
+                    <Typography variant="body2">
+                      {request.bloodCenterPhone}
+                    </Typography>
+                  </Box>
+                </Box>
 
-            <p>
-              <strong>Estado:</strong>{" "}
-              {getStatusLabel(request.status)}
-            </p>
+                <Box className="request-info-row">
+                  <CalendarMonthOutlined color="action" />
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">
+                      Fecha de vencimiento
+                    </Typography>
+                    <Typography variant="body2">
+                      {formatDate(request.expirationDate)}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
 
-            <p>
-              <strong>Vencimiento:</strong>{" "}
-              {formatDate(request.expirationDate)}
-            </p>
+              <Box className="request-card-footer">
+                <Chip
+                  label={getStatusLabel(request.status)}
+                  color={request.status === "ACTIVE" ? "success" : "default"}
+                  size="small"
+                />
 
-            {request.status === "ACTIVE" && (
-              <button
-                type="button"
-                disabled={isRegistering || hasPendingDonation}
-                onClick={() => void handleRegister(request.id)}
-              >
-                {isRegistering
-                  ? "Inscribiendo..."
-                  : isCurrentPendingRequest
-                    ? "Ya estás inscripto"
-                    : hasPendingDonation
-                      ? "Ya tenés otra inscripción pendiente"
-                      : "Quiero donar"}
-              </button>
-            )}
+                {request.status === "ACTIVE" && (
+                  <Button
+                    variant="contained"
+                    startIcon={<VolunteerActivismOutlined />}
+                    disabled={isRegistering || hasPendingDonation}
+                    onClick={() => void handleRegister(request.id)}
+                    sx={{
+                      backgroundColor: "#D71920",
+                      "&:hover": { backgroundColor: "#A81219" },
+                    }}
+                  >
+                    {isRegistering
+                      ? "Inscribiendo..."
+                      : isCurrentPendingRequest
+                        ? "Ya estás inscripto"
+                        : hasPendingDonation
+                          ? "Ya tenés otra inscripción"
+                          : "Quiero donar"}
+                  </Button>
+                )}
+              </Box>
 
-            {message && (
-              <p
-                role={message.type === "error" ? "alert" : "status"}
-              >
-                {message.text}
-              </p>
-            )}
-          </article>
+              {message && (
+                <Alert
+                  severity={message.type}
+                  icon={
+                    message.type === "success" ? (
+                      <CheckCircleOutlined />
+                    ) : undefined
+                  }
+                  sx={{ mt: 2, borderRadius: 2 }}
+                >
+                  {message.text}
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
         );
       })}
-    </div>
+    </Box>
   );
 }
 

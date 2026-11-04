@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Alert,
   Box,
@@ -16,8 +16,6 @@ import {
   LockOutlined,
   VolunteerActivismOutlined,
 } from "@mui/icons-material";
-
-import "./Login.css";
 
 import { useAuth } from "../../context/useAuth";
 import type { AuthResponse } from "../../types/auth";
@@ -130,6 +128,22 @@ function Login() {
               },
             }}
           />
+
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: -1 }}>
+            <Button
+              component={Link}
+              to="/forgot-password"
+              variant="text"
+              size="small"
+              sx={{
+                color: "#D71920",
+                textTransform: "none",
+                fontWeight: 600,
+              }}
+            >
+              ¿Olvidaste tu contraseña?
+            </Button>
+          </Box>
 
           <Button
             type="submit"

@@ -18,6 +18,8 @@ import Donations from "../pages/Donations/Donations";
 import DonationManagement from "../pages/Donations/DonationManagement";
 import Users from "../pages/Users/Users";
 import BloodCenters from "../pages/BloodCenters/BloodCenters";
+import ForgotPassword from "../pages/Auth/ForgotPassword";
+import ResetPassword from "../pages/Auth/ResetPassword";
 
 function AppRouter() {
   return (
@@ -35,6 +37,24 @@ function AppRouter() {
           element={
             <GuestRoute>
               <Login />
+            </GuestRoute>
+          }
+        />
+
+        <Route
+          path="/reset-password"
+          element={
+            <GuestRoute>
+              <ResetPassword />
+            </GuestRoute>
+          }
+        />
+
+        <Route
+          path="/forgot-password"
+          element={
+            <GuestRoute>
+              <ForgotPassword />
             </GuestRoute>
           }
         />

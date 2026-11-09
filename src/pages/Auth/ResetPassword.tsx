@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link as RouterLink, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Alert,
@@ -24,7 +24,19 @@ function ResetPassword() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const token = searchParams.get("token") ?? "";
+  const [token] = useState(() => searchParams.get("token") ?? "");
+
+  const tokenCleaned = useRef(false);
+
+  useEffect(() => {
+    if (tokenCleaned.current) return;
+
+    tokenCleaned.current = true;
+
+    if (searchParams.has("token")) {
+      navigate("/reset-password", { replace: true });
+    }
+  }, [navigate, searchParams]);
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

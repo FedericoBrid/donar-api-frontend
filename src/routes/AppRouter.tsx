@@ -20,16 +20,14 @@ import Users from "../pages/Users/Users";
 import BloodCenters from "../pages/BloodCenters/BloodCenters";
 import ForgotPassword from "../pages/Auth/ForgotPassword";
 import ResetPassword from "../pages/Auth/ResetPassword";
+import Landing from "../pages/Landing/Landing";
 
 function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
         {/* Ruta inicial */}
-        <Route
-          path="/"
-          element={<Navigate to="/dashboard" replace />}
-        />
+        <Route path="/" element={<Landing />} />
 
         {/* Acceso para usuarios no autenticados */}
         <Route

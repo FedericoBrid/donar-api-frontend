@@ -449,3 +449,346 @@
     padding: 28px 24px;
   }
 }
+
+
+/* ========================= BENEFICIOS ========================= */
+
+.landing-benefits {
+  padding: 100px 0;
+  background-color: #fff;
+}
+
+.landing-benefits-content {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  align-items: center;
+  gap: 75px;
+}
+
+.landing-benefits-intro h2 {
+  margin: 12px 0 18px;
+  color: #172033;
+  font-size: clamp(30px, 3.5vw, 42px);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -1px;
+}
+
+.landing-benefits-intro > p {
+  color: #667085;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.landing-benefits-button,
+.landing-centers-button {
+  margin-top: 25px !important;
+  padding: 12px 24px !important;
+  border-radius: 25px !important;
+  background-color: #d71920 !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  text-transform: none !important;
+}
+
+.landing-benefits-button:hover,
+.landing-centers-button:hover {
+  background-color: #b9141a !important;
+}
+
+.landing-benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 35px 28px;
+}
+
+.landing-benefit-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.landing-benefit-icon {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  border-radius: 13px;
+  background-color: rgba(215, 25, 32, 0.09);
+}
+
+.landing-benefit-icon svg {
+  color: #d71920;
+  font-size: 27px;
+}
+
+.landing-benefit-item h3 {
+  margin-bottom: 8px;
+  color: #172033;
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.landing-benefit-item p {
+  color: #667085;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* ========================= HEMOCENTROS ========================= */
+
+.landing-blood-centers {
+  padding: 85px 0;
+  background-color: #f5f6f8;
+}
+
+.landing-blood-centers-content {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 45px;
+  background-color: #fff;
+  border: 1px solid #e8eaf0;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(23, 32, 51, 0.04);
+}
+
+.landing-blood-centers-icon {
+  flex-shrink: 0;
+  width: 75px;
+  height: 75px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background-color: rgba(215, 25, 32, 0.09);
+}
+
+.landing-blood-centers-icon svg {
+  color: #d71920;
+  font-size: 40px;
+}
+
+.landing-blood-centers-text {
+  flex: 1;
+}
+
+.landing-blood-centers-text h2 {
+  margin: 10px 0;
+  color: #172033;
+  font-size: clamp(23px, 2.5vw, 30px);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.landing-blood-centers-text p {
+  color: #667085;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.landing-centers-button {
+  flex-shrink: 0;
+  margin-top: 0 !important;
+}
+
+/* ========================= RESPONSIVE ========================= */
+
+@media (max-width: 900px) {
+  .landing-benefits-content {
+    grid-template-columns: 1fr;
+    gap: 45px;
+  }
+
+  .landing-blood-centers-content {
+    flex-wrap: wrap;
+  }
+
+  .landing-centers-button {
+    margin-left: 105px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .landing-benefits,
+  .landing-blood-centers {
+    padding: 70px 0;
+  }
+
+  .landing-benefits-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .landing-blood-centers-content {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 28px 22px;
+    gap: 20px;
+  }
+
+  .landing-centers-button {
+    margin-left: 0 !important;
+  }
+}
+
+
+/* ========================= CTA FINAL ========================= */
+
+.landing-final-cta {
+  padding: 85px 0;
+  background-color: #d71920;
+}
+
+.landing-final-cta-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+}
+
+.landing-final-cta-icon {
+  width: 65px;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+}
+
+.landing-final-cta-icon svg {
+  font-size: 34px;
+}
+
+.landing-final-cta-content h2 {
+  margin-bottom: 15px;
+  font-size: clamp(29px, 4vw, 42px);
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.landing-final-cta-content p {
+  max-width: 580px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.landing-final-cta-button {
+  margin-top: 20px !important;
+  padding: 12px 25px !important;
+  border-radius: 25px !important;
+  background-color: #fff !important;
+  color: #d71920 !important;
+  font-weight: 750 !important;
+  text-transform: none !important;
+}
+
+.landing-final-cta-button:hover {
+  background-color: #f5f6f8 !important;
+}
+
+.landing-cta-arrow {
+  margin-left: 5px;
+  font-size: 20px;
+}
+
+/* ========================= FOOTER ========================= */
+
+.landing-footer {
+  padding: 55px 0 20px;
+  background-color: #172033;
+}
+
+.landing-footer-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 50px;
+  padding-bottom: 40px;
+}
+
+.landing-footer-brand .landing-logo {
+  display: inline-flex;
+}
+
+.landing-footer-brand .landing-logo p {
+  color: #fff;
+}
+
+.landing-footer-brand > p {
+  margin-top: 12px;
+  color: #b8c0ce;
+  font-size: 14px;
+}
+
+.landing-footer-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 13px;
+}
+
+.landing-footer-links > span {
+  margin-bottom: 5px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.landing-footer-links a {
+  color: #b8c0ce;
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.landing-footer-links a:hover {
+  color: #fff;
+}
+
+.landing-footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.landing-footer-bottom p {
+  color: #98a2b3;
+  font-size: 12px;
+}
+
+/* ========================= RESPONSIVE ========================= */
+
+@media (max-width: 600px) {
+  .landing-final-cta {
+    padding: 65px 0;
+  }
+
+  .landing-footer {
+    padding: 45px 0 20px;
+  }
+
+  .landing-footer-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 35px 20px;
+  }
+
+  .landing-footer-brand {
+    grid-column: 1 / -1;
+  }
+
+  .landing-footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+}
+

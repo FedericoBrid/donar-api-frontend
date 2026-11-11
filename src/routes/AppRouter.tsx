@@ -21,6 +21,7 @@ import BloodCenters from "../pages/BloodCenters/BloodCenters";
 import ForgotPassword from "../pages/Auth/ForgotPassword";
 import ResetPassword from "../pages/Auth/ResetPassword";
 import Landing from "../pages/Landing/Landing";
+import Register from "../pages/Register/Register";
 
 function AppRouter() {
   return (
@@ -30,6 +31,14 @@ function AppRouter() {
         <Route path="/" element={<Landing />} />
 
         {/* Acceso para usuarios no autenticados */}
+        <Route
+          path="/register"
+          element={
+            <GuestRoute>
+              <Register />
+            </GuestRoute>
+          }
+        />
         <Route
           path="/login"
           element={

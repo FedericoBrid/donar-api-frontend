@@ -162,7 +162,12 @@ function Login() {
             )}
           </Button>
         </Box>
-
+        <Box className="login-register-link">
+          <Typography variant="body2" color="text.secondary">
+            ¿No tenés una cuenta?{" "}
+            <Link to="/register">Registrate</Link>
+          </Typography>
+        </Box>
         <Typography className="login-footer" variant="caption">
           Donar+ · Sistema de gestión de donaciones de sangre
         </Typography>

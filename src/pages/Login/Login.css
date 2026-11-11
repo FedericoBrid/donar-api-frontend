@@ -99,3 +99,20 @@
     padding: 28px 22px;
   }
 }
+
+.login-register-link {
+  margin-top: 22px;
+  text-align: center;
+}
+
+.login-register-link a {
+  color: #D71920;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.login-register-link a:hover {
+  color: #b9151b;
+  text-decoration: underline;
+}

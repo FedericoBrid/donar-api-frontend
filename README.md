@@ -1,177 +1,264 @@
 # Donar+ Frontend
 
-Aplicación web frontend de **Donar+**, un sistema de gestión de donaciones de sangre que conecta a usuarios, hemocentros y administradores para facilitar la publicación y gestión de solicitudes de sangre y el registro de donaciones.
+Frontend application for **Donar+**, a blood donation management system that connects users, blood centers, and administrators to facilitate blood request management and donation registration.
 
-Este proyecto forma parte de la migración del sistema original desarrollado en PHP hacia una arquitectura moderna basada en **React y Spring Boot**, con una API REST independiente.
+This project is part of the migration of the original PHP application to a modern architecture based on **React and Spring Boot**, with an independent REST API.
 
-## Tecnologías utilizadas
+## Technologies
 
-- **React 19** – Biblioteca para construir interfaces de usuario.
-- **TypeScript** – Tipado estático para JavaScript.
-- **Vite 8** – Herramienta de desarrollo y construcción.
-- **Material UI 9.5** – Componentes de interfaz.
-- **Material React Table** – Tablas y gestión de datos.
-- **MUI X Date Pickers** – Selectores de fechas.
-- **React Router 7** – Navegación y gestión de rutas.
-- **Axios** – Comunicación HTTP con el backend.
-- **Emotion** – Estilos y personalización de componentes.
+- **React 19** – User interface library.
+- **TypeScript** – Static typing for JavaScript.
+- **Vite 8** – Development and build tool.
+- **Material UI 9.5** – UI component library.
+- **Material React Table** – Data tables and management.
+- **MUI X Date Pickers** – Date selection components.
+- **React Router 7** – Routing and navigation.
+- **Axios** – HTTP client for API communication.
+- **Emotion** – Styling and component customization.
+- **Docker** – Application containerization.
+- **Nginx** – Production web server.
 
-## Arquitectura del frontend
+## Project Structure
 
-El proyecto está organizado por responsabilidades, separando las páginas, los servicios de comunicación con la API, la gestión del estado de autenticación y la configuración de rutas.
+The frontend is organized by responsibilities, separating pages, API communication services, authentication management, and route configuration.
 
 ```text
 src/
-├── constants/       # Catálogos y constantes
-├── context/         # Contexto y gestión de autenticación
-├── layouts/         # Estructura general de la aplicación
-├── pages/           # Páginas y módulos funcionales
-│   ├── Auth/         # Recuperación y restablecimiento de contraseña
-│   ├── BloodCenters/ # Gestión de hemocentros
-│   ├── Dashboard/   # Panel principal
-│   ├── Donations/   # Donaciones y gestión de donaciones
-│   ├── Landing/     # Página pública de inicio
-│   ├── Login/       # Inicio de sesión
-│   ├── Register/    # Registro de usuarios
-│   ├── Request/     # Solicitudes de sangre
-│   └── Users/       # Gestión de usuarios y roles
-├── routes/          # Configuración y protección de rutas
-├── services/        # Comunicación con la API REST
-├── theme/           # Tema visual de Material UI
-├── types/           # Tipos e interfaces TypeScript
-└── utils/           # Funciones auxiliares
+├── constants/       # Catalogs and application constants
+├── context/         # Authentication context and state
+├── layouts/         # Application layouts
+├── pages/           # Application pages and functional modules
+│   ├── Auth/         # Password recovery and reset
+│   ├── BloodCenters/ # Blood center management
+│   ├── Dashboard/    # Main dashboard
+│   ├── Donations/    # Donation management
+│   ├── Landing/      # Public landing page
+│   ├── Login/        # User login
+│   ├── Register/     # User registration
+│   ├── Request/      # Blood requests
+│   └── Users/        # User and role management
+├── routes/          # Route configuration and protection
+├── services/        # REST API communication
+├── theme/           # Material UI theme
+├── types/           # TypeScript types and interfaces
+└── utils/            # Utility functions
 ```
 
-### Autenticación y autorización
+## Authentication and Authorization
 
-La autenticación se gestiona mediante Context API y tokens JWT.
+Authentication is handled through React Context API and JWT tokens.
 
-- El inicio de sesión se realiza a través de la API.
-- El token JWT se almacena en `localStorage`.
-- Axios incorpora automáticamente el token en las solicitudes HTTP mediante el encabezado `Authorization: Bearer`.
-- Las rutas se protegen mediante componentes específicos para usuarios autenticados, invitados y roles autorizados.
+- User login is performed through the backend REST API.
+- JWT tokens are stored in `localStorage`.
+- Axios automatically includes the token in HTTP requests through the `Authorization: Bearer` header.
+- Routes are protected according to authentication status and user roles.
 
-### Roles del sistema
+### System Roles
 
-- **ADMIN:** acceso a las funcionalidades administrativas y gestión general del sistema.
-- **HEMOADMIN:** gestión operativa de hemocentros y solicitudes de sangre.
-- **USER:** consulta de solicitudes y gestión de sus propias donaciones.
+- **ADMIN:** Full administrative access and system management.
+- **HEMOADMIN:** Operational management of blood centers and blood requests.
+- **USER:** Access to blood requests and personal donation management.
 
-## Funcionalidades
+## Features
 
-- Landing page pública.
-- Registro e inicio de sesión.
-- Recuperación y restablecimiento de contraseña.
-- Autenticación mediante JWT.
-- Panel principal.
-- Consulta y gestión de solicitudes de sangre.
-- Consulta y gestión de donaciones.
-- Gestión de hemocentros.
-- Administración de usuarios y roles.
-- Control de acceso según roles y permisos.
+- Public landing page.
+- User registration and login.
+- Password recovery and reset.
+- JWT-based authentication.
+- Main dashboard.
+- Blood request management.
+- Donation management.
+- Blood center management.
+- User and role administration.
+- Role-based access control.
 
-## Integración con el backend
+## Backend Integration
 
-El frontend consume los servicios de una API REST desarrollada con **Java y Spring Boot**.
+The frontend consumes a REST API developed with **Java and Spring Boot**.
 
-La comunicación se realiza mediante Axios y utiliza JSON para el intercambio de información.
+Communication is handled through Axios, using JSON for data exchange.
 
-Los servicios se encuentran organizados en `src/services/`:
+API services are organized under `src/services/`:
 
-- `userService.ts`: operaciones relacionadas con usuarios.
-- `bloodCenterService.ts`: operaciones relacionadas con hemocentros.
-- `bloodRequestService.ts`: operaciones relacionadas con solicitudes de sangre.
-- `donationService.ts`: operaciones relacionadas con donaciones.
-- `api.tsx`: configuración de Axios e integración de autenticación.
+- `userService.ts`: User-related operations.
+- `bloodCenterService.ts`: Blood center operations.
+- `bloodRequestService.ts`: Blood request operations.
+- `donationService.ts`: Donation operations.
+- `api.tsx`: Axios configuration and authentication integration.
 
-### Repositorio backend
+Backend repository:
 
 [Donar+ API – Spring Boot](https://github.com/FedericoBrid/donar-api)
 
-## Configuración y ejecución
+## Docker Deployment
 
-### Requisitos previos
+The Docker Compose configuration is located in the backend repository. It builds and runs the three application services:
 
-- Node.js.
-- npm.
-- Backend Donar+ configurado y en ejecución.
+| Service | Technology | URL |
+|---|---|---|
+| Frontend | React + Nginx | http://localhost:3000 |
+| Backend | Spring Boot | http://localhost:8080 |
+| Database | MySQL 8.4 | localhost:3306 |
 
-### Clonar el repositorio
+### Requirements
+
+- Git.
+- Docker Desktop.
+- Docker Compose.
+
+### 1. Clone the repositories
+
+Both repositories must be cloned into the same parent directory:
+
+```text
+donar-plus/
+├── donar-api/
+└── donar-api-frontend/
+```
+
+Run:
 
 ```bash
+mkdir donar-plus
+cd donar-plus
+
+git clone https://github.com/FedericoBrid/donar-api.git
 git clone https://github.com/FedericoBrid/donar-api-frontend.git
 ```
 
-Ingresar al directorio:
+### 2. Configure environment variables
+
+Navigate to the backend repository:
 
 ```bash
-cd donar-api-frontend
+cd donar-api
 ```
 
-### Instalar dependencias
+Create the `.env` file using the backend `.env.example` as a reference.
+
+Configure the required database, JWT, email, and initial administrator variables.
+
+The frontend URL must be configured as:
+
+```env
+FRONTEND_URL=http://localhost:3000
+```
+
+Do not commit the `.env` file or expose sensitive credentials.
+
+### 3. Build and start the application
+
+From the `donar-api` directory, run:
+
+```bash
+docker compose up --build -d
+```
+
+Docker Compose builds the backend and frontend images and starts MySQL, Spring Boot, and Nginx.
+
+The backend waits for MySQL to become healthy before starting.
+
+### 4. Access the application
+
+Once all services are running:
+
+- **Frontend:** http://localhost:3000
+- **Backend API:** http://localhost:8080/api/v1
+- **Swagger UI:** http://localhost:8080/swagger-ui/index.html
+
+### 5. Check container status
+
+```bash
+docker compose ps
+```
+
+View service logs:
+
+```bash
+docker compose logs -f frontend
+docker compose logs -f backend
+docker compose logs -f mysql
+```
+
+### 6. Stop the application
+
+```bash
+docker compose down
+```
+
+This stops and removes the containers while preserving the MySQL data volume.
+
+To also remove the database volume:
+
+```bash
+docker compose down -v
+```
+
+**Warning:** The `-v` option deletes the persistent database volume and all stored data.
+
+## Development Mode
+
+The frontend can also be executed independently using Vite.
+
+### Requirements
+
+- Node.js.
+- npm.
+- Donar+ backend running.
+
+### 1. Install dependencies
+
+From the frontend directory:
 
 ```bash
 npm install
 ```
 
-### Configuración de la API
-
-Actualmente, la URL del backend se encuentra configurada en `src/services/api.tsx`:
-
-```typescript
-const api = axios.create({
-  baseURL: 'http://localhost:8080/api/v1',
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-```
-
-Por lo tanto, para utilizar el frontend en desarrollo, el backend debe estar disponible en:
-
-`http://localhost:8080`
-
-### Ejecutar en desarrollo
+### 2. Start the development server
 
 ```bash
 npm run dev
 ```
 
-Vite mostrará en la terminal la dirección local para acceder a la aplicación.
+Vite will display the local development URL in the terminal.
 
-### Compilar para producción
+The backend must be available at `http://localhost:8080`, and the frontend API configuration must point to that address.
+
+### 3. Build for production
 
 ```bash
 npm run build
 ```
 
-Los archivos compilados se generan en el directorio `dist/`.
+The production files are generated in the `dist/` directory.
 
-Para previsualizar la compilación:
+To preview the production build:
 
 ```bash
 npm run preview
 ```
 
-### Análisis de código
+### 4. Run code analysis
 
 ```bash
 npm run lint
 ```
 
-## Relación entre los repositorios
+## Repositories
 
-Donar+ está dividido en dos proyectos independientes que trabajan en conjunto:
+Donar+ is divided into two independent projects that work together:
 
-| Proyecto | Tecnología | Repositorio |
+| Project | Technology | Repository |
 |---|---|---|
-| Frontend | React, TypeScript y Vite | [donar-api-frontend](https://github.com/FedericoBrid/donar-api-frontend) |
-| Backend | Java y Spring Boot | [donar-api](https://github.com/FedericoBrid/donar-api) |
+| Frontend | React, TypeScript and Vite | [donar-api-frontend](https://github.com/FedericoBrid/donar-api-frontend) |
+| Backend | Java and Spring Boot | [donar-api](https://github.com/FedericoBrid/donar-api) |
 
-El frontend es responsable de la interfaz y la experiencia de usuario, mientras que el backend gestiona la lógica de negocio, la persistencia de datos y la seguridad mediante su API REST.
+The frontend handles the user interface and user experience, while the backend manages business logic, data persistence, security, and REST API services.
 
-## Estado del proyecto
+## Author
 
-El frontend forma parte del proceso de migración y modernización del sistema Donar+.
+**Federico Brid**
 
-La contenerización mediante Docker y las instrucciones para ejecutar ambos proyectos en conjunto se incorporarán posteriormente.
+- GitHub: [FedericoBrid](https://github.com/FedericoBrid)
+- Frontend: [donar-api-frontend](https://github.com/FedericoBrid/donar-api-frontend)
+- Backend: [donar-api](https://github.com/FedericoBrid/donar-api)
